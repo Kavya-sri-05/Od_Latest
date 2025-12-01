@@ -79,6 +79,10 @@ const odRequestSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    approverName: {
+      type: String,
+      default: "",
+    },
     hodComment: {
       type: String,
       default: "",

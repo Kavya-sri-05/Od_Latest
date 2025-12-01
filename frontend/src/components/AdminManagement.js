@@ -24,6 +24,7 @@ import {
   DialogActions,
   AppBar,
   Toolbar,
+  Backdrop,
 } from "@mui/material";
 import { Search as SearchIcon } from "@mui/icons-material";
 import { Pie } from "react-chartjs-2";
@@ -37,7 +38,6 @@ import {
 import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-//import { DateRangePicker } from "@mui/x-date-pickers/DateRangePicker";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
@@ -58,6 +58,62 @@ ChartJS.register(ArcElement, ChartTooltip, Legend, Title);
 const API_BASE_URL = "http://localhost:5001";
 
 const AdminManagement = () => {
+  // Emergency dialog state and handlers
+  const [emergencyDialogOpen, setEmergencyDialogOpen] = useState(false);
+  const [selectedEmergencyRequest, setSelectedEmergencyRequest] = useState(null);
+  const [emergencyReason, setEmergencyReason] = useState("");
+  const [emergencyError, setEmergencyError] = useState("");
+  const [processingAction, setProcessingAction] = useState(false);
+
+  const handleEmergencyForward = async () => {
+    if (!emergencyReason) {
+      setEmergencyError("Please provide a reason for emergency forwarding.");
+      return;
+    }
+    setProcessingAction(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.post(
+        `${API_BASE_URL}/api/od-requests/${selectedEmergencyRequest._id}/emergency-forward`,
+        { reason: emergencyReason },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "x-auth-token": token,
+          },
+        }
+      );
+      setRequests((prev) =>
+        prev.map((req) =>
+          req._id === selectedEmergencyRequest._id ? { ...req, ...res.data } : req
+        )
+      );
+      setEmergencyDialogOpen(false);
+      setEmergencyReason("");
+      setSelectedEmergencyRequest(null);
+      setProcessingAction(false);
+    } catch (err) {
+      setProcessingAction(false);
+      setEmergencyError(
+        err.response?.data?.message || "Error forwarding to admin."
+      );
+    }
+  };
+
+  const handleOpenEmergencyDialog = (request) => {
+    setSelectedEmergencyRequest(request);
+    setEmergencyDialogOpen(true);
+    setEmergencyReason("");
+    setEmergencyError("");
+  };
+
+  const handleCloseEmergencyDialog = () => {
+    setEmergencyDialogOpen(false);
+    setSelectedEmergencyRequest(null);
+    setEmergencyReason("");
+    setEmergencyError("");
+  };
+
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -105,6 +161,9 @@ const AdminManagement = () => {
   const [autoForwardTimeoutLoading, setAutoForwardTimeoutLoading] =
     useState(false);
   const [autoForwardTimeoutMsg, setAutoForwardTimeoutMsg] = useState("");
+
+  const [viewProofDialogOpen, setViewProofDialogOpen] = useState(false);
+  const [selectedProofRequest, setSelectedProofRequest] = useState(null);
 
   const allColumns = [
     { label: "Student Name", key: "studentName" },
@@ -370,6 +429,7 @@ const AdminManagement = () => {
 
   const handleForwardToHod = async (requestId) => {
     try {
+      setProcessingAction(true);
       await axios.put(
         `${API_BASE_URL}/api/od-requests/${requestId}/forward-to-hod`,
         {},
@@ -379,12 +439,71 @@ const AdminManagement = () => {
           },
         }
       );
+      setProcessingAction(false);
       fetchAllRequests();
+      setError("Request forwarded to HOD successfully!");
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Failed to forward request to HOD"
+      setProcessingAction(false);
+      const errorMsg = getErrorMessage(
+        err,
+        "Failed to forward request to HOD"
       );
+      showErrorDialog("Forward to HOD Failed", errorMsg);
     }
+  };
+
+  const handleVerifyProof = async (requestId) => {
+    try {
+      setProcessingAction(true);
+      await axios.put(
+        `${API_BASE_URL}/api/od-requests/${requestId}/verify-proof`,
+        { verified: true },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setProcessingAction(false);
+      fetchAllRequests();
+      setError("Proof verified and notifications sent to all selected staff!");
+    } catch (err) {
+      setProcessingAction(false);
+      const errorMsg = getErrorMessage(err, "Failed to verify proof");
+      showErrorDialog("Proof Verification Failed", errorMsg);
+    }
+  };
+
+  const handleRejectProof = async (requestId) => {
+    try {
+      setProcessingAction(true);
+      await axios.put(
+        `${API_BASE_URL}/api/od-requests/${requestId}/verify-proof`,
+        { verified: false },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setProcessingAction(false);
+      fetchAllRequests();
+      setError("Proof rejected and notifications sent to all selected staff!");
+    } catch (err) {
+      setProcessingAction(false);
+      const errorMsg = getErrorMessage(err, "Failed to reject proof");
+      showErrorDialog("Proof Rejection Failed", errorMsg);
+    }
+  };
+
+  const handleViewProof = (request) => {
+    setSelectedProofRequest(request);
+    setViewProofDialogOpen(true);
+  };
+
+  const handleCloseProofDialog = () => {
+    setViewProofDialogOpen(false);
+    setSelectedProofRequest(null);
   };
 
   const getTimeElapsed = (timestamp) => {
@@ -597,6 +716,7 @@ const AdminManagement = () => {
     setSenderEmailError("");
     setSenderEmailPasswordError("");
     try {
+      setProcessingAction(true);
       // Update sender email
       await axios.put(
         `${API_BASE_URL}/api/settings/sender-email`,
@@ -617,10 +737,17 @@ const AdminManagement = () => {
           },
         }
       );
+      setProcessingAction(false);
       setOpenSenderDialog(false);
       setSenderEmailPassword("");
+      setSenderEmailError("Email updated successfully!");
     } catch (err) {
-      setSenderEmailError("Failed to update sender email or password");
+      setProcessingAction(false);
+      const errorMsg = getErrorMessage(
+        err,
+        "Failed to update sender email or password"
+      );
+      showErrorDialog("Update Failed", errorMsg);
     }
     setSenderEmailLoading(false);
   };
@@ -641,6 +768,7 @@ const AdminManagement = () => {
     setEventTypeMsg("");
     const finalEventType = eventTypeRequests[idx]?.eventType || eventType;
     try {
+      setProcessingAction(true);
       await axios.post(
         `${API_BASE_URL}/api/settings/event-types`,
         { eventType: finalEventType },
@@ -661,10 +789,11 @@ const AdminManagement = () => {
         headers: { "x-auth-token": localStorage.getItem("token") },
       });
       setEventTypes(res.data.eventTypes || []);
+      setProcessingAction(false);
     } catch (err) {
-      setEventTypeMsg(
-        err.response?.data?.message || "Failed to add event type."
-      );
+      setProcessingAction(false);
+      const errorMsg = getErrorMessage(err, "Failed to add event type.");
+      showErrorDialog("Accept Event Type Failed", errorMsg);
     }
   };
 
@@ -717,6 +846,7 @@ const AdminManagement = () => {
 
   const handleDeleteEventType = async () => {
     try {
+      setProcessingAction(true);
       await axios.delete(`${API_BASE_URL}/api/settings/event-types`, {
         data: { eventType: deleteEventTypeValue },
         headers: { "x-auth-token": localStorage.getItem("token") },
@@ -725,10 +855,11 @@ const AdminManagement = () => {
       setDeleteDialogOpen(false);
       setDeleteEventTypeValue("");
       setEventTypeMsg(`Deleted '${deleteEventTypeValue}' from event types.`);
+      setProcessingAction(false);
     } catch (err) {
-      setEventTypeMsg(
-        err.response?.data?.message || "Failed to delete event type."
-      );
+      setProcessingAction(false);
+      const errorMsg = getErrorMessage(err, "Failed to delete event type.");
+      showErrorDialog("Delete Event Type Failed", errorMsg);
     }
   };
 
@@ -736,6 +867,7 @@ const AdminManagement = () => {
     setAutoForwardTimeoutLoading(true);
     setAutoForwardTimeoutMsg("");
     try {
+      setProcessingAction(true);
       const res = await axios.put(
         `${API_BASE_URL}/api/settings/auto-forward-faculty-timeout`,
         { timeout: Number(autoForwardTimeoutInput) },
@@ -745,10 +877,11 @@ const AdminManagement = () => {
       );
       setAutoForwardTimeout(res.data.timeout);
       setAutoForwardTimeoutMsg("Timeout updated successfully");
+      setProcessingAction(false);
     } catch (err) {
-      setAutoForwardTimeoutMsg(
-        err.response?.data?.message || "Failed to update timeout"
-      );
+      setProcessingAction(false);
+      const errorMsg = getErrorMessage(err, "Failed to update timeout");
+      showErrorDialog("Update Timeout Failed", errorMsg);
     } finally {
       setAutoForwardTimeoutLoading(false);
     }
@@ -760,6 +893,78 @@ const AdminManagement = () => {
   const [excelUploadOpen, setExcelUploadOpen] = useState(false);
   const [excelFile, setExcelFile] = useState(null);
   const [excelUploadMsg, setExcelUploadMsg] = useState("");
+
+  // Error dialog state
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [errorDialogTitle, setErrorDialogTitle] = useState("");
+  const [errorDialogMessage, setErrorDialogMessage] = useState("");
+
+  // Loading state for actions
+  //const [processingAction, setProcessingAction] = useState(false);
+
+  // Auto-clear messages after a few seconds
+  useEffect(() => {
+    if (senderEmailError) {
+      const timer = setTimeout(() => {
+        setSenderEmailError("");
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [senderEmailError]);
+
+  useEffect(() => {
+    if (eventTypeMsg) {
+      const timer = setTimeout(() => {
+        setEventTypeMsg("");
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [eventTypeMsg]);
+
+  useEffect(() => {
+    if (autoForwardTimeoutMsg) {
+      const timer = setTimeout(() => {
+        setAutoForwardTimeoutMsg("");
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [autoForwardTimeoutMsg]);
+
+  useEffect(() => {
+    if (excelUploadMsg) {
+      const timer = setTimeout(() => {
+        setExcelUploadMsg("");
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [excelUploadMsg]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
+  // Helper function to show error dialog
+  const showErrorDialog = (title, message) => {
+    setErrorDialogTitle(title);
+    setErrorDialogMessage(message);
+    setErrorDialogOpen(true);
+  };
+
+  // Helper function to extract error message from response
+  const getErrorMessage = (err, defaultMsg) => {
+    const errorMsg =
+      err.response?.data?.message ||
+      err.response?.data?.msg ||
+      err.response?.data?.error ||
+      err.message ||
+      defaultMsg;
+    return errorMsg;
+  };
 
   // Excel upload handlers
   const handleOpenExcelUpload = () => {
@@ -778,6 +983,7 @@ const AdminManagement = () => {
     const formData = new FormData();
     formData.append("file", excelFile);
     try {
+      setProcessingAction(true);
       setExcelUploadMsg("Uploading...");
       await axios.post(
         `${API_BASE_URL}/api/admin/bulk-register-students`,
@@ -791,11 +997,12 @@ const AdminManagement = () => {
       );
       setExcelUploadMsg("Students registered successfully!");
       setExcelFile(null);
+      setProcessingAction(false);
       fetchAllRequests(); // Refresh data if needed
     } catch (err) {
-      setExcelUploadMsg(
-        err.response?.data?.message || "Failed to upload Excel file."
-      );
+      setProcessingAction(false);
+      const errorMsg = getErrorMessage(err, "Failed to upload Excel file.");
+      showErrorDialog("Excel Upload Failed", errorMsg);
     }
   };
 
@@ -814,6 +1021,30 @@ const AdminManagement = () => {
 
   return (
     <Box display="flex" flexDirection="column" minHeight="100vh">
+      {/* Processing Backdrop with Spinner */}
+      <Backdrop
+        sx={{
+          color: "#fff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          backdropFilter: "blur(4px)",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+        }}
+        open={processingAction}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+          }}
+        >
+          <CircularProgress color="inherit" size={60} />
+          <Typography variant="h6">Processing...</Typography>
+        </Box>
+      </Backdrop>
+
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
@@ -880,15 +1111,14 @@ const AdminManagement = () => {
               </Box>
               {/* Statistics summary below the pie chart */}
               <Box sx={{ mt: 2 }}>
-                {statusLabels.length > 0 ? (
-                  statusLabels.map((label, idx) => (
-                    <Typography key={label} variant="body1" gutterBottom>
-                      {label}: {statusCounts[label]}
-                    </Typography>
-                  ))
-                ) : (
-                  <Alert severity="info">No statistics available</Alert>
-                )}
+                {statusLabels.length > 0
+                  ? statusLabels.map((label, idx) => (
+                      <Typography key={label} variant="body1" gutterBottom>
+                        {label}: {statusCounts[label]}
+                      </Typography>
+                    ))
+                  : <Alert severity="info">No statistics available</Alert>
+                }
               </Box>
             </Paper>
           </Grid>
@@ -927,7 +1157,7 @@ const AdminManagement = () => {
               margin="normal"
             />
             <TextField
-              label="Sender Email Password"
+              label="Sender Email's App Password"
               type="password"
               value={senderEmailPassword}
               onChange={(e) => setSenderEmailPassword(e.target.value)}
@@ -1005,7 +1235,37 @@ const AdminManagement = () => {
             startIcon={<UploadFileIcon />}
             onClick={handleOpenExcelUpload}
           >
-            Bulk Register (Excel)
+            Student Bulk Register (Excel)
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={async () => {
+              try {
+                const response = await axios.get(
+                  `${API_BASE_URL}/assets/sample_students.xlsx`,
+                  { responseType: "blob" }
+                );
+                const url = window.URL.createObjectURL(response.data);
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", "sample_students.xlsx");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+              } catch (error) {
+                console.error("Error downloading sample file:", error);
+                showErrorDialog(
+                  "Download Failed",
+                  "Failed to download sample Excel file. Make sure the file exists at /assets/sample_students.xlsx"
+                );
+              }
+            }}
+            title="Download sample Excel template for bulk student registration"
+            sx={{ color: "#ffffff" }}
+          >
+            📥 Download Sample Excel
           </Button>
         </Box>
 
@@ -1158,77 +1418,73 @@ const AdminManagement = () => {
                       <TableCell>Reason</TableCell>
                       <TableCell>Faculty Advisor</TableCell>
                       <TableCell>Status</TableCell>
+                      <TableCell>Proof Status</TableCell>
                       <TableCell>Time Elapsed</TableCell>
                       <TableCell>Brochure</TableCell>
                       <TableCell>Actions</TableCell>
+        
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {filteredRequests.map((request) => (
                       <TableRow key={request._id}>
                         <TableCell>{request.student?.name || "N/A"}</TableCell>
-                        <TableCell>
-                          {request.student?.registerNo || "N/A"}
-                        </TableCell>
-                        <TableCell>
-                          {request.student?.currentYear || "N/A"}
-                        </TableCell>
+                        <TableCell>{request.student?.registerNo || "N/A"}</TableCell>
+                        <TableCell>{request.student?.currentYear || "N/A"}</TableCell>
                         <TableCell>{request.eventName || "N/A"}</TableCell>
                         <TableCell>{request.eventType || "N/A"}</TableCell>
+                        <TableCell>{request.eventDate ? new Date(request.eventDate).toLocaleDateString() : "N/A"}</TableCell>
                         <TableCell>
-                          {request.eventDate
-                            ? new Date(request.eventDate).toLocaleDateString()
-                            : "N/A"}
-                        </TableCell>
-                        <TableCell>
-                          <Tooltip
-                            title={request.reason || "No reason provided"}
-                          >
-                            <Typography noWrap style={{ maxWidth: 200 }}>
-                              {request.reason || "N/A"}
-                            </Typography>
+                          <Tooltip title={request.reason || "No reason provided"}>
+                            <Typography noWrap style={{ maxWidth: 200 }}>{request.reason || "N/A"}</Typography>
                           </Tooltip>
                         </TableCell>
+                        <TableCell>{request.classAdvisor?.name || "N/A"}</TableCell>
                         <TableCell>
-                          {request.classAdvisor?.name || "N/A"}
+                          <Chip label={request.status?.replace(/_/g, " ") || "N/A"} color={getStatusColor(request.status)} />
                         </TableCell>
                         <TableCell>
-                          <Chip
-                            label={request.status?.replace(/_/g, " ") || "N/A"}
-                            color={getStatusColor(request.status)}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          {getTimeElapsed(
-                            request.lastStatusChangeAt || request.createdAt
+                          {!request.proofSubmitted ? (
+                            <Chip label="NOT SUBMITTED" size="small" />
+                          ) : request.proofRejected ? (
+                            <Chip label="REJECTED" color="error" size="small" />
+                          ) : request.proofVerified ? (
+                            <Chip label="VERIFIED" color="success" size="small" />
+                          ) : (
+                            <Chip label="PENDING" color="warning" size="small" />
                           )}
                         </TableCell>
+                        <TableCell>{getTimeElapsed(request.lastStatusChangeAt || request.createdAt)}</TableCell>
                         <TableCell>
                           {request.brochure && (
-                            <Button
-                              variant="outlined"
-                              size="small"
-                              onClick={() =>
-                                window.open(
-                                  `http://localhost:5001/${request.brochure}`,
-                                  "_blank"
-                                )
-                              }
-                            >
-                              View Brochure
-                            </Button>
+                            <Button variant="outlined" size="small" onClick={() => window.open(`http://localhost:5001/${request.brochure}`, "_blank")}>View Brochure</Button>
                           )}
                         </TableCell>
                         <TableCell>
-                          {request.status === "forwarded_to_admin" && (
-                            <Button
-                              variant="contained"
-                              color="primary"
-                              size="small"
-                              onClick={() => handleForwardToHod(request._id)}
-                            >
+                          {request.proofSubmitted && !request.proofVerified && !request.proofRejected && (
+                            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", flexDirection: "column" }}>
+                              <Button variant="outlined" size="small" onClick={() => handleViewProof(request)}>View Proof</Button>
+                              <Box sx={{ display: "flex", gap: 1 }}>
+                                <Button variant="contained" color="success" size="small" onClick={() => handleVerifyProof(request._id)}>Approve Proof</Button>
+                                <Button variant="contained" color="error" size="small" onClick={() => handleRejectProof(request._id)}>Reject Proof</Button>
+                              </Box>
+                            </Box>
+                          )}
+                          {request.status === "forwarded_to_admin" && !request.proofSubmitted && (
+                            <Button variant="contained" color="primary" size="small" onClick={() => handleForwardToHod(request._id)}>
                               Forward to HOD
                             </Button>
+                          )}
+                          {request.status === "forwarded_to_admin" && request.proofSubmitted && (
+                            <Typography variant="caption" display="block" sx={{ color: "orange" }}>
+                              Awaiting proof verification
+                            </Typography>
+                          )}
+                          {request.proofVerified && (
+                            <Chip label="✓ Proof Verified" color="success" size="small" />
+                          )}
+                          {request.proofRejected && (
+                            <Chip label="✗ Proof Rejected" color="error" size="small" />
                           )}
                         </TableCell>
                       </TableRow>
@@ -1482,8 +1738,101 @@ const AdminManagement = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* View Proof Dialog */}
+      <Dialog
+        open={viewProofDialogOpen}
+        onClose={handleCloseProofDialog}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>View Submitted Proof</DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          {selectedProofRequest?.student && (
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: "bold", mb: 1 }}>
+                Student: {selectedProofRequest.student.name} ({selectedProofRequest.student.registerNo})
+              </Typography>
+              <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                Event: {selectedProofRequest.eventName}
+              </Typography>
+            </Box>
+          )}
+          {selectedProofRequest?.proofDocument ? (
+            <Box
+              sx={{
+                width: "100%",
+                height: "60vh",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                bgcolor: "#f5f5f5",
+                borderRadius: 1,
+                p: 2,
+              }}
+            >
+              {selectedProofRequest.proofDocument.toLowerCase().endsWith(".pdf") ? (
+                <iframe
+                  src={`http://localhost:5001/${selectedProofRequest.proofDocument}`}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    border: "none",
+                    borderRadius: "4px",
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  }}
+                  title="Proof Document"
+                />
+              ) : (
+                <img
+                  src={`http://localhost:5001/${selectedProofRequest.proofDocument}`}
+                  alt="Proof Document"
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    objectFit: "contain",
+                    borderRadius: "4px",
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  }}
+                />
+              )}
+            </Box>
+          ) : (
+            <Alert severity="info">No proof document to display</Alert>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseProofDialog}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Error Dialog */}
+      <Dialog
+        open={errorDialogOpen}
+        onClose={() => setErrorDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ color: "#d32f2f", fontWeight: "bold" }}>
+          ⚠️ {errorDialogTitle}
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <Typography variant="body1" sx={{ whiteSpace: "pre-wrap", lineHeight: 1.6 }}>
+            {errorDialogMessage}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setErrorDialogOpen(false)}
+            variant="contained"
+            color="error"
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
-};
+}
 
 export default AdminManagement;

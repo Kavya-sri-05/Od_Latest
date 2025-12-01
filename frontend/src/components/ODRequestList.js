@@ -22,6 +22,8 @@ import {
   Autocomplete,
   AppBar,
   Toolbar,
+  Backdrop,
+  CircularProgress,
 } from "@mui/material";
 import { Download as DownloadIcon } from "@mui/icons-material";
 import axios from "axios";
@@ -38,6 +40,24 @@ const ODRequestList = () => {
   const [facultyList, setFacultyList] = useState([]);
   const [selectedFaculty, setSelectedFaculty] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
+    useEffect(() => {
+      if (success) {
+        const timer = setTimeout(() => {
+          setSuccess("");
+        }, 3000);
+        return () => clearTimeout(timer);
+      }
+    }, [success]);
+
+    useEffect(() => {
+      if (error) {
+        const timer = setTimeout(() => {
+          setError("");
+        }, 5000);
+        return () => clearTimeout(timer);
+      }
+    }, [error]);
 
   useEffect(() => {
     fetchRequests();
@@ -150,9 +170,12 @@ const ODRequestList = () => {
 
   const handleDownloadPDF = async (requestId) => {
     try {
+        setActionLoading(true);
+        setError("");
       const token = localStorage.getItem("token");
       if (!token) {
         setError("Authentication token not found. Please login again.");
+        setActionLoading(false);
         return;
       }
 
@@ -167,23 +190,27 @@ const ODRequestList = () => {
         }
       );
 
-      // Create a blob from the PDF data
       const blob = new Blob([response.data], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
-
-      // Create a temporary link element and trigger the download
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute("download", `od_request_${requestId}.pdf`);
       document.body.appendChild(link);
       link.click();
-
-      // Clean up
       link.parentNode.removeChild(link);
       window.URL.revokeObjectURL(url);
+      setActionLoading(false);
     } catch (err) {
-      console.error("Error downloading PDF:", err);
-      setError(err.response?.data?.message || "Error downloading PDF");
+      setActionLoading(false);
+      let msg = "";
+      if (err.response) {
+        msg = err.response.data.message || "Error downloading PDF.";
+      } else if (err.request) {
+        msg = "No response from server. Please check your connection.";
+      } else {
+        msg = `Error downloading PDF: "${err.message}"`;
+      }
+      setError(msg);
     }
   };
 
@@ -216,6 +243,8 @@ const ODRequestList = () => {
     );
 
     try {
+      setActionLoading(true);
+      setError("");
       const token = localStorage.getItem("token");
       const response = await axios.post(
         `http://localhost:5001/api/od-requests/${selectedRequest._id}/submit-proof`,
@@ -229,7 +258,7 @@ const ODRequestList = () => {
         }
       );
 
-      setSuccess("Proof submitted successfully");
+      setSuccess("Proof submitted successfully to class advisor and admin for approval");
       setRequests(
         requests.map((req) =>
           req._id === response.data._id ? response.data : req
@@ -237,9 +266,18 @@ const ODRequestList = () => {
       );
       handleCloseProofDialog();
       fetchRequests();
+      setActionLoading(false);
     } catch (error) {
-      console.error("Error submitting proof:", error);
-      setError(error.response?.data?.message || "Error submitting proof");
+      setActionLoading(false);
+      let msg = "";
+      if (error.response) {
+        msg = error.response.data.message || "Error submitting proof.";
+      } else if (error.request) {
+        msg = "No response from server. Please check your connection.";
+      } else {
+        msg = `Error submitting proof: "${error.message}"`;
+      }
+      setError(msg);
     }
   };
   const handleCloseProofDialog = () => {
@@ -271,7 +309,23 @@ const ODRequestList = () => {
   };
 
   return (
-    <Box display="flex" flexDirection="column" minHeight="100vh">
+    <>
+      {/* Full-screen Processing Backdrop for all actions */}
+      <Backdrop
+        sx={{
+          color: "#fff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          backdropFilter: "blur(4px)",
+          backgroundColor: "rgba(0, 0, 0, 0.7)",
+        }}
+        open={actionLoading}
+      >
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2 }}>
+          <CircularProgress color="inherit" size={60} />
+          <Typography variant="h5">Processing...</Typography>
+        </Box>
+      </Backdrop>
+      <Box display="flex" flexDirection="column" minHeight="100vh">
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
@@ -420,9 +474,12 @@ const ODRequestList = () => {
           maxWidth="sm"
           fullWidth
         >
-          <DialogTitle>Submit Proof Document</DialogTitle>
+          <DialogTitle>Submit Proof Document for Verification</DialogTitle>
           <DialogContent>
             <Box sx={{ mt: 2 }}>
+              <Alert severity="info" sx={{ mb: 2 }}>
+                Your proof will be sent to both your class advisor and admin for approval. Once either approves, notifications will be sent to all selected staff.
+              </Alert>
               <input
                 type="file"
                 accept=".pdf,application/pdf"
@@ -518,6 +575,7 @@ const ODRequestList = () => {
       </Paper>
       </Container>
     </Box>
+    </>
   );
 };
 

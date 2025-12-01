@@ -23,6 +23,8 @@ import {
   Tooltip,
   AppBar,
   Toolbar,
+  CircularProgress,
+  Backdrop,
 } from "@mui/material";
 import {
   Check as CheckIcon,
@@ -39,9 +41,12 @@ const FacultyODRequestList = () => {
   const [success, setSuccess] = useState("");
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [comment, setComment] = useState("");
+  const [approverName, setApproverName] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [action, setAction] = useState("");
   const [viewProofDialogOpen, setViewProofDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
 
   const fetchRequests = async () => {
     try {
@@ -90,23 +95,26 @@ const FacultyODRequestList = () => {
   const handleDialogClose = () => {
     setOpenDialog(false);
     setComment("");
+    setApproverName("");
     setSelectedRequest(null);
     setAction("");
   };
 
   const handleSubmit = async () => {
     try {
+      setActionLoading(true);
+      setError("");
       const token = localStorage.getItem("token");
       if (!token) {
         setError("Authentication token not found. Please login again.");
+        setActionLoading(false);
         return;
       }
 
-      const endpoint =
-        action === "approve" ? "advisor-approve" : "advisor-reject";
+      const endpoint = action === "approve" ? "advisor-approve" : "advisor-reject";
       const res = await axios.put(
         `http://localhost:5001/api/od-requests/${selectedRequest}/${endpoint}`,
-        { comment },
+        { comment, approverName },
         {
           headers: {
             "x-auth-token": token,
@@ -114,17 +122,21 @@ const FacultyODRequestList = () => {
         }
       );
 
-      console.log("Request updated:", res.data);
       setSuccess(`Request ${action}d successfully`);
       handleDialogClose();
+      setActionLoading(false);
       fetchRequests();
     } catch (err) {
-      console.error("Error updating request:", err);
+      setActionLoading(false);
+      let msg = "";
       if (err.response) {
-        setError(err.response.data.message || `Error ${action}ing request`);
+        msg = err.response.data.message || `Error ${action}ing request.`;
+      } else if (err.request) {
+        msg = "No response from server. Please check your connection.";
       } else {
-        setError(`Error ${action}ing request. Please try again.`);
+        msg = `Error ${action}ing request: "${err.message}"`;
       }
+      setError(msg);
     }
   };
 
@@ -147,19 +159,31 @@ const FacultyODRequestList = () => {
 
   const handleProofVerification = async (requestId, verified) => {
     try {
+      setActionLoading(true);
+      setError("");
       await axios.put(
         `http://localhost:5001/api/od-requests/${requestId}/verify-proof`,
         { verified },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Changed header to Bearer token
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
       setSuccess(`Proof ${verified ? "verified" : "rejected"} successfully`);
+      setActionLoading(false);
       fetchRequests();
     } catch (err) {
-      setError(err.response?.data?.msg || "Error verifying proof");
+      setActionLoading(false);
+      let msg = "";
+      if (err.response) {
+        msg = err.response.data.message || err.response.data.msg || "Error verifying proof.";
+      } else if (err.request) {
+        msg = "No response from server. Please check your connection.";
+      } else {
+        msg = `Error verifying proof: "${err.message}"`;
+      }
+      setError(msg);
     }
   };
 
@@ -184,6 +208,21 @@ const FacultyODRequestList = () => {
 
   return (
     <Box display="flex" flexDirection="column" minHeight="100vh">
+      {/* Full-screen Processing Backdrop for all actions */}
+      <Backdrop
+        sx={{
+          color: "#fff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          backdropFilter: "blur(4px)",
+          backgroundColor: "rgba(0, 0, 0, 0.7)",
+        }}
+        open={actionLoading}
+      >
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2 }}>
+          <CircularProgress color="inherit" size={60} />
+          <Typography variant="h5">Processing...</Typography>
+        </Box>
+      </Backdrop>
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
@@ -372,10 +411,18 @@ const FacultyODRequestList = () => {
         </Paper>
 
         <Dialog open={openDialog} onClose={handleDialogClose}>
-          <DialogTitle>Add Comment</DialogTitle>
+          <DialogTitle>{action === "approve" ? "Approve Request" : "Reject Request"}</DialogTitle>
           <DialogContent>
             <TextField
               autoFocus
+              margin="dense"
+              label="Your Name (Class Advisor/Admin)"
+              fullWidth
+              value={approverName}
+              onChange={(e) => setApproverName(e.target.value)}
+              sx={{ mb: 2 }}
+            />
+            <TextField
               margin="dense"
               label="Comment"
               fullWidth
@@ -386,10 +433,13 @@ const FacultyODRequestList = () => {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleDialogClose}>Cancel</Button>
+            <Button onClick={handleDialogClose} disabled={loading}>
+              Cancel
+            </Button>
             <Button
               onClick={handleSubmit}
               color={action === "approve" ? "success" : "error"}
+              disabled={loading || !approverName}
             >
               {action === "approve" ? "Approve" : "Reject"}
             </Button>

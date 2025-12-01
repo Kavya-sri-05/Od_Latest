@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Container,
@@ -22,6 +22,8 @@ import {
   DialogActions,
   AppBar,
   Toolbar,
+  Backdrop,
+  CircularProgress,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
@@ -46,6 +48,7 @@ const ODRequestForm = () => {
     timeType: "fullDay",
     startTime: null,
     endTime: null,
+    isEmergency: false, // <-- add emergency flag
   });
   const defaultEventTypes = [
     "hackathon",
@@ -60,9 +63,12 @@ const ODRequestForm = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [brochureFile, setBrochureFile] = useState(null);
+  const [brochureError, setBrochureError] = useState("");
   const [requestDialogOpen, setRequestDialogOpen] = useState(false);
   const [requestedEventType, setRequestedEventType] = useState("");
   const [requestEventTypeMsg, setRequestEventTypeMsg] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const brochureInputRef = useRef(null);
 
   useEffect(() => {
     const fetchEventTypes = async () => {
@@ -90,10 +96,12 @@ const ODRequestForm = () => {
   }, []);
 
   const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: type === "checkbox" ? checked : value,
     });
+    
   };
 
   const handleDateChange = (field) => (date) => {
@@ -115,16 +123,16 @@ const ODRequestForm = () => {
     if (file) {
       const allowedTypes = ["application/pdf"];
       if (!allowedTypes.includes(file.type)) {
-        setError("Only PDF files are allowed for brochure.");
+        setBrochureError("Only PDF files are allowed for brochure.");
         setBrochureFile(null);
         return;
       }
       if (file.size > 1 * 1024 * 1024) {
-        setError("Brochure file size must be less than 1MB.");
+        setBrochureError("Brochure file size must be less than 1MB. Please choose a smaller file.");
         setBrochureFile(null);
         return;
       }
-      setError("");
+      setBrochureError("");
       setBrochureFile(file);
     }
   };
@@ -148,7 +156,13 @@ const ODRequestForm = () => {
       return;
     }
 
+    // prevent submission if brochure has an error
+    if (brochureError) {
+      setError("Please fix brochure upload before submitting.");
+      return;
+    }
     try {
+      setIsSubmitting(true);
       const form = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         if (value !== null && value !== undefined) {
@@ -161,6 +175,8 @@ const ODRequestForm = () => {
       // Only append faculty advisor ID
       form.append("facultyAdvisor", user?.student?.facultyAdvisor?._id || "");
 
+      // Emergency flag is sent to backend
+      // Backend should handle status/timestamp update
       const response = await axios.post(
         "http://localhost:5001/api/od-requests",
         form,
@@ -182,10 +198,17 @@ const ODRequestForm = () => {
         timeType: "fullDay",
         startTime: null,
         endTime: null,
+        isEmergency: false,
       });
       setBrochureFile(null);
+      // Clear file input
+      if (brochureInputRef.current) {
+        brochureInputRef.current.value = "";
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Error submitting OD request");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -372,10 +395,31 @@ const ODRequestForm = () => {
                 Upload Event Brochure (PDF, max 1MB)
               </Typography>
               <input
+                ref={brochureInputRef}
                 type="file"
                 accept=".pdf,application/pdf"
                 onChange={handleBrochureChange}
                 style={{ marginBottom: "1rem" }}
+              />
+              {brochureError && (
+                <Alert severity="warning" sx={{ mt: 1, mb: 1 }}>
+                  {brochureError}
+                </Alert>
+              )}
+            </Grid>
+
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <input
+                    type="checkbox"
+                    name="isEmergency"
+                    checked={formData.isEmergency}
+                    onChange={handleChange}
+                    style={{ marginRight: 8 }}
+                  />
+                }
+                label="Emergency (Directly forward to Admin)"
               />
             </Grid>
 
@@ -386,6 +430,7 @@ const ODRequestForm = () => {
                 color="primary"
                 fullWidth
                 size="large"
+                disabled={!!brochureError || isSubmitting}
               >
                 Submit Request
               </Button>
@@ -393,6 +438,17 @@ const ODRequestForm = () => {
           </Grid>
         </Box>
       </Paper>
+
+      <Backdrop
+        open={isSubmitting}
+        sx={{
+          color: '#fff',
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          backdropFilter: 'blur(3px)'
+        }}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
 
       <Dialog
         open={requestDialogOpen}

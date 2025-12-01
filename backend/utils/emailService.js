@@ -46,9 +46,7 @@ const sendODRequestNotification = async (
         <h3>Student Details:</h3>
         <ul>
           <li><strong>Name:</strong> ${studentDetails.name}</li>
-          <li><strong>Register Number:</strong> ${
-            studentDetails.registerNo
-          }</li>
+          <li><strong>Register Number:</strong> ${studentDetails.registerNo}</li>
           <li><strong>Department:</strong> ${studentDetails.department}</li>
           <li><strong>Year:</strong> ${studentDetails.currentYear}</li>
         </ul>
@@ -57,25 +55,17 @@ const sendODRequestNotification = async (
         <ul>
           <li><strong>Event Name:</strong> ${odDetails.eventName}</li>
           <li><strong>Event Type:</strong> ${odDetails.eventType}</li>
-          <li><strong>Event Date:</strong> ${new Date(
-            odDetails.eventDate
-          ).toLocaleDateString()}</li>
-          <li><strong>Start Date:</strong> ${new Date(
-            odDetails.startDate
-          ).toLocaleDateString()}</li>
-          <li><strong>End Date:</strong> ${new Date(
-            odDetails.endDate
-          ).toLocaleDateString()}</li>
+          <li><strong>Event Date:</strong> ${new Date(odDetails.eventDate).toLocaleDateString()}</li>
+          <li><strong>Start Date:</strong> ${new Date(odDetails.startDate).toLocaleDateString()}</li>
+          <li><strong>End Date:</strong> ${new Date(odDetails.endDate).toLocaleDateString()}</li>
           <li><strong>Time Type:</strong> ${odDetails.timeType}</li>
-          ${
-            odDetails.timeType === "half-day"
-              ? `
-            <li><strong>Start Time:</strong> ${odDetails.startTime}</li>
-            <li><strong>End Time:</strong> ${odDetails.endTime}</li>
-          `
-              : ""
-          }
+          ${odDetails.timeType === "half-day" ? `<li><strong>Start Time:</strong> ${odDetails.startTime}</li><li><strong>End Time:</strong> ${odDetails.endTime}</li>` : ""}
           <li><strong>Reason:</strong> ${odDetails.reason}</li>
+        </ul>
+
+        <h3>Approver Details:</h3>
+        <ul>
+          <li><strong>Class Advisor/Admin Name:</strong> ${odDetails.approverName || "-"}</li>
         </ul>
 
         <p>Please review this request at your earliest convenience.</p>
@@ -155,16 +145,10 @@ const sendProofVerificationNotification = async (
     const mailOptions = {
       from: email,
       to: facultyEmails.join(","),
-      subject: `OD Request Proof ${
-        isVerified ? "Verified" : "Rejected"
-      } Notification`,
+      subject: `OD Request Proof ${isVerified ? "Verified" : "Rejected"} Notification`,
       html: `
-        <h2>OD Request Proof ${
-          isVerified ? "Verified" : "Rejected"
-        } Notification</h2>
-        <p>A student's OD request proof has been <strong>${
-          isVerified ? "verified" : "rejected"
-        }</strong>.</p>
+        <h2>OD Request Proof ${isVerified ? "Verified" : "Rejected"} Notification</h2>
+        <p>A student's OD request proof has been <strong>${isVerified ? "verified" : "rejected"}</strong>.</p>
         
         <h3>Student Details:</h3>
         <p>Name: ${studentDetails.name}</p>
@@ -178,24 +162,18 @@ const sendProofVerificationNotification = async (
         <p>Event Date: ${new Date(odDetails.eventDate).toLocaleDateString()}</p>
         <p>Start Date: ${new Date(odDetails.startDate).toLocaleDateString()}</p>
         <p>End Date: ${new Date(odDetails.endDate).toLocaleDateString()}</p>
-        ${
-          odDetails.timeType === "particularHours"
-            ? `
-          <p>Start Time: ${odDetails.startTime}</p>
-          <p>End Time: ${odDetails.endTime}</p>
-        `
-            : ""
-        }
+        ${odDetails.timeType === "particularHours" ? `<p>Start Time: ${odDetails.startTime}</p><p>End Time: ${odDetails.endTime}</p>` : ""}
         <p>Reason: ${odDetails.reason}</p>
         
+        <h3>Approver Details:</h3>
+        <ul>
+          <li><strong>Class Advisor/Admin Name:</strong> ${odDetails.approverName || "-"}</li>
+        </ul>
+
         <p>Please find attached:</p>
         <ul>
           <li>The student's submitted proof document</li>
-          ${
-            isVerified
-              ? "<li>The approved OD form with verification details</li>"
-              : ""
-          }
+          ${isVerified ? "<li>The approved OD form with verification details</li>" : ""}
         </ul>
       `,
       attachments,

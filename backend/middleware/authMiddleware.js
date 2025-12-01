@@ -75,4 +75,13 @@ const hod = (req, res, next) => {
   }
 };
 
-module.exports = { protect, faculty, student, hod };
+const facultyOrAdmin = (req, res, next) => {
+  if (req.user && (req.user.role === "faculty" || req.user.role === "admin")) {
+    next();
+  } else {
+    res.status(401);
+    throw new Error("Not authorized as faculty or admin");
+  }
+};
+
+module.exports = { protect, faculty, student, hod, facultyOrAdmin };

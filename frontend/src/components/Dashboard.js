@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { useAuth } from "../contexts/AuthContext";
 import Contributors from './Contributors';
+import downloadGuidePDF from "./GuideMe";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -179,7 +180,7 @@ const Dashboard = () => {
             </Typography>
             <Button 
               color="inherit" 
-              onClick={() => navigate("/guide")}
+              onClick={() => downloadGuidePDF(user)}
               sx={{ mr: 2 }}
             >
               Guide Me

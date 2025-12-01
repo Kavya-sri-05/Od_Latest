@@ -12,7 +12,14 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress,
+  Backdrop,
 } from "@mui/material";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { useAuth } from "../contexts/AuthContext";
 import axios from "axios";
 
@@ -31,6 +38,8 @@ const Register = () => {
   const [facultyAdvisors, setFacultyAdvisors] = useState([]);
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchFacultyAdvisors = async () => {
@@ -80,28 +89,38 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     const result = await register(formData);
+    setLoading(false);
 
     if (result.success) {
       navigate("/dashboard");
     } else {
       setError(result.error);
+      setShowErrorDialog(true);
     }
   };
 
   return (
     <Container maxWidth="sm">
+      {/* Loading Backdrop */}
+      <Backdrop
+        sx={{
+          color: "#fff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          backdropFilter: "blur(4px)",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+        }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
       <Paper elevation={3} sx={{ p: 4, mt: 8 }}>
         <Typography variant="h4" gutterBottom align="center">
           Register
         </Typography>
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
 
         <Box component="form" onSubmit={handleSubmit}>
           <TextField
@@ -112,6 +131,7 @@ const Register = () => {
             onChange={handleChange}
             margin="normal"
             required
+            disabled={loading}
           />
           <TextField
             fullWidth
@@ -122,6 +142,7 @@ const Register = () => {
             onChange={handleChange}
             margin="normal"
             required
+            disabled={loading}
           />
           <TextField
             fullWidth
@@ -132,8 +153,9 @@ const Register = () => {
             onChange={handleChange}
             margin="normal"
             required
+            disabled={loading}
           />
-          <FormControl fullWidth margin="normal" required>
+          <FormControl fullWidth margin="normal" required disabled={loading}>
             <InputLabel>Role</InputLabel>
             <Select
               name="role"
@@ -156,6 +178,7 @@ const Register = () => {
               onChange={handleChange}
               margin="normal"
               required
+              disabled={loading}
             />
           )}
           {formData.role === "student" && (
@@ -168,6 +191,7 @@ const Register = () => {
                 onChange={handleChange}
                 margin="normal"
                 required
+                disabled={loading}
               />
               <TextField
                 fullWidth
@@ -176,6 +200,7 @@ const Register = () => {
                 value="Computer Science and Engineering"
                 margin="normal"
                 required
+                disabled
               />
 
               <TextField
@@ -187,13 +212,14 @@ const Register = () => {
                 onChange={handleChange}
                 margin="normal"
                 required
+                disabled={loading}
                 helperText="Enter the year you joined the college (e.g., 2023)"
                 inputProps={{
                   min: 2020,
                   max: new Date().getFullYear(),
                 }}
               />
-              <FormControl fullWidth margin="normal" required>
+              <FormControl fullWidth margin="normal" required disabled={loading}>
                 <InputLabel>Faculty Advisor</InputLabel>
                 <Select
                   name="facultyAdvisor"
@@ -217,11 +243,46 @@ const Register = () => {
             fullWidth
             size="large"
             sx={{ mt: 3 }}
+            disabled={loading}
           >
-            Register
+            {loading ? "Registering..." : "Register"}
           </Button>
         </Box>
       </Paper>
+
+      {/* Error Dialog */}
+      <Dialog
+        open={showErrorDialog}
+        onClose={() => setShowErrorDialog(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            color: "#d32f2f",
+          }}
+        >
+          <ErrorOutlineIcon />
+          Registration Failed
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <Typography variant="body1" sx={{ whiteSpace: "pre-wrap" }}>
+            {error}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setShowErrorDialog(false)}
+            variant="contained"
+            color="error"
+          >
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

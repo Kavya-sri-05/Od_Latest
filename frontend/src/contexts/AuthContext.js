@@ -65,9 +65,16 @@ export const AuthProvider = ({ children }) => {
       setUser(user);
       return { success: true };
     } catch (err) {
+      // Extract error message from different possible locations
+      const errorMessage =
+        err.response?.data?.msg ||
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        "Login failed";
       return {
         success: false,
-        error: err.response?.data?.msg || "Login failed",
+        error: errorMessage,
       };
     }
   };
@@ -86,9 +93,16 @@ export const AuthProvider = ({ children }) => {
       setUser(user);
       return { success: true };
     } catch (err) {
+      // Extract error message from different possible locations
+      const errorMessage =
+        err.response?.data?.msg ||
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        "Registration failed";
       return {
         success: false,
-        error: err.response?.data?.msg || "Registration failed",
+        error: errorMessage,
       };
     }
   };

@@ -9,6 +9,7 @@ const {
   faculty,
   student,
   hod,
+  facultyOrAdmin,
 } = require("../middleware/authMiddleware");
 const ODRequest = require("../models/ODRequest");
 const User = require("../models/User");
@@ -262,11 +263,11 @@ router.get(
 
 // @desc    Verify proof document
 // @route   PUT /api/od-requests/:id/verify-proof
-// @access  Private/ClassAdvisor
+// @access  Private/ClassAdvisor or Admin
 router.put(
   "/:id/verify-proof",
   protect,
-  faculty,
+  facultyOrAdmin,
   asyncHandler(async (req, res) => {
     const { verified } = req.body;
 
@@ -276,21 +277,32 @@ router.put(
       }`
     );
 
-    const odRequest = await ODRequest.findById(req.params.id).populate(
-      "student",
-      "name registerNo yearOfJoin currentYear"
-    );
+    const odRequest = await ODRequest.findById(req.params.id)
+      .populate("student", "name registerNo yearOfJoin currentYear")
+      .populate("classAdvisor", "email name")
+      .populate("hod", "email name")
+      .populate("notifyFaculty", "email name");
 
     if (!odRequest) {
       res.status(404);
       throw new Error("OD request not found");
     }
 
+    // Check if user is either class advisor or any admin
     const facultyAdvisorId = odRequest.facultyAdvisor?._id?.toString();
-    if (!facultyAdvisorId || facultyAdvisorId !== req.user.id) {
+    const classAdvisorId = odRequest.classAdvisor?._id?.toString();
+    const hodId = odRequest.hod?._id?.toString();
+    const userId = req.user.id.toString();
+    const userRole = req.user.role;
+
+    // Allow if user is the class advisor, OR user is admin role
+    const isClassAdvisor = facultyAdvisorId && facultyAdvisorId === userId;
+    const isAdmin = userRole === "admin";
+
+    if (!isClassAdvisor && !isAdmin) {
       res.status(401);
       throw new Error(
-        "Not authorized: Only facultyAdvisor can verify/reject proof"
+        "Not authorized: Only class advisor or admin can verify/reject proof"
       );
     }
 
@@ -310,14 +322,18 @@ router.put(
     odRequest.updatedAt = Date.now();
     const updatedRequest = await odRequest.save();
 
-    // Prepare faculty emails
-    const facultyEmails = [odRequest.facultyAdvisor.email];
+    // Prepare emails for all selected staff (notifyFaculty list)
+    const facultyEmails = [];
+    
+    // Add all selected staff from notifyFaculty
     if (odRequest.notifyFaculty?.length) {
-      const notifiedFacultyEmails = await User.find({
-        _id: { $in: odRequest.notifyFaculty },
-      }).select("email");
-      facultyEmails.push(...notifiedFacultyEmails.map((f) => f.email));
+      odRequest.notifyFaculty.forEach(faculty => {
+        if (faculty.email) {
+          facultyEmails.push(faculty.email);
+        }
+      });
     }
+
     const eventTypeToSend = odRequest.eventType || "Unknown";
 
     // Fetch the full student document to get currentYear and department
@@ -346,53 +362,60 @@ router.put(
           await updatedRequest.save();
         }
       }
-      await sendProofVerificationNotification(
-        facultyEmails,
-        {
-          name: odRequest.student.name,
-          registerNo: odRequest.student.registerNo,
-          department,
-          year,
-        },
-        {
-          eventName: odRequest.eventName,
-          eventType: eventTypeToSend,
-          eventDate: odRequest.eventDate,
-          startDate: odRequest.startDate,
-          endDate: odRequest.endDate,
-          timeType: odRequest.timeType,
-          startTime: odRequest.startTime,
-          endTime: odRequest.endTime,
-          reason: odRequest.reason,
-        },
-        odRequest.proofDocument,
-        approvedPDFPath,
-        "verified"
-      );
+      
+      // Only send emails if there are recipients
+      if (facultyEmails.length > 0) {
+        await sendProofVerificationNotification(
+          facultyEmails,
+          {
+            name: odRequest.student.name,
+            registerNo: odRequest.student.registerNo,
+            department,
+            year,
+          },
+          {
+            eventName: odRequest.eventName,
+            eventType: eventTypeToSend,
+            eventDate: odRequest.eventDate,
+            startDate: odRequest.startDate,
+            endDate: odRequest.endDate,
+            timeType: odRequest.timeType,
+            startTime: odRequest.startTime,
+            endTime: odRequest.endTime,
+            reason: odRequest.reason,
+          },
+          odRequest.proofDocument,
+          approvedPDFPath,
+          "verified"
+        );
+      }
     } else {
-      await sendProofVerificationNotification(
-        facultyEmails,
-        {
-          name: odRequest.student.name,
-          registerNo: odRequest.student.registerNo,
-          department,
-          year,
-        },
-        {
-          eventName: odRequest.eventName,
-          eventType: eventTypeToSend,
-          eventDate: odRequest.eventDate,
-          startDate: odRequest.startDate,
-          endDate: odRequest.endDate,
-          timeType: odRequest.timeType,
-          startTime: odRequest.startTime,
-          endTime: odRequest.endTime,
-          reason: odRequest.reason,
-        },
-        odRequest.proofDocument,
-        null,
-        "rejected"
-      );
+      // Only send rejection emails if there are recipients
+      if (facultyEmails.length > 0) {
+        await sendProofVerificationNotification(
+          facultyEmails,
+          {
+            name: odRequest.student.name,
+            registerNo: odRequest.student.registerNo,
+            department,
+            year,
+          },
+          {
+            eventName: odRequest.eventName,
+            eventType: eventTypeToSend,
+            eventDate: odRequest.eventDate,
+            startDate: odRequest.startDate,
+            endDate: odRequest.endDate,
+            timeType: odRequest.timeType,
+            startTime: odRequest.startTime,
+            endTime: odRequest.endTime,
+            reason: odRequest.reason,
+          },
+          odRequest.proofDocument,
+          null,
+          "rejected"
+        );
+      }
     }
     res.json(updatedRequest);
   })
@@ -467,6 +490,8 @@ router.post(
   asyncHandler(async (req, res) => {
     const odRequest = await ODRequest.findById(req.params.id)
       .populate("student", "name registerNo yearOfJoin currentYear")
+      .populate("classAdvisor", "email name")
+      .populate("hod", "email name")
       .populate("notifyFaculty", "email name");
 
     if (!odRequest) {
@@ -491,39 +516,59 @@ router.post(
     }
     await odRequest.save();
 
-    // Send email to faculties after proof submission
+    // Send email to class advisor and admin (HOD) for approval
     try {
-      const facultyEmails = (odRequest.notifyFaculty || [])
-        .map((f) => f.email)
-        .filter(Boolean);
-      await sendProofVerificationNotification(
-        facultyEmails,
-        {
-          name: odRequest.student.name,
-          registerNo: odRequest.student.registerNo,
-          department: odRequest.student.department,
-          year: odRequest.student.currentYear,
-        },
-        {
-          eventName: odRequest.eventName,
-          eventType: odRequest.eventType,
-          eventDate: odRequest.eventDate,
-          startDate: odRequest.startDate,
-          endDate: odRequest.endDate,
-          timeType: odRequest.timeType,
-          startTime: odRequest.startTime,
-          endTime: odRequest.endTime,
-          reason: odRequest.reason,
-        },
-        odRequest.proofDocument,
-        odRequest.approvedPDFPath
-      );
+      const approverEmails = [];
+      
+      // Add class advisor
+      if (odRequest.classAdvisor && odRequest.classAdvisor.email) {
+        approverEmails.push({
+          email: odRequest.classAdvisor.email,
+          name: odRequest.classAdvisor.name,
+          role: "Class Advisor"
+        });
+      }
+      
+      // Add HOD/Admin
+      if (odRequest.hod && odRequest.hod.email) {
+        approverEmails.push({
+          email: odRequest.hod.email,
+          name: odRequest.hod.name,
+          role: "Admin"
+        });
+      }
+
+      // Send notification to approvers
+      if (approverEmails.length > 0) {
+        await sendProofVerificationNotification(
+          approverEmails.map(a => a.email),
+          {
+            name: odRequest.student.name,
+            registerNo: odRequest.student.registerNo,
+            department: odRequest.student.department,
+            year: odRequest.student.currentYear,
+          },
+          {
+            eventName: odRequest.eventName,
+            eventType: odRequest.eventType,
+            eventDate: odRequest.eventDate,
+            startDate: odRequest.startDate,
+            endDate: odRequest.endDate,
+            timeType: odRequest.timeType,
+            startTime: odRequest.startTime,
+            endTime: odRequest.endTime,
+            reason: odRequest.reason,
+          },
+          odRequest.proofDocument,
+          odRequest.approvedPDFPath
+        );
+      }
     } catch (emailErr) {
       console.error("Error sending proof verification email:", emailErr);
       // Don't block the response if email fails
     }
 
-    res.json({ message: "Proof document submitted successfully" });
+    res.json({ message: "Proof document submitted successfully to class advisor and admin for approval" });
   })
 );
 
@@ -972,7 +1017,7 @@ router.get(
     // Header row for signatures
     drawTableRowContent(
       doc,
-      ["STUDENT", "CLASS ADVISOR", "HOD", "DEAN"],
+      ["STUDENT", "for CLASS ADVISOR", "HOD", "DEAN"],
       [colWidth, colWidth, colWidth, colWidth],
       sigX,
       sigY,
@@ -1073,6 +1118,7 @@ router.put(
 
       odRequest.status = "approved_by_advisor";
       odRequest.advisorComment = req.body.comment || "";
+      odRequest.approverName = req.body.approverName || req.user.name || "";
       odRequest.advisorApprovedAt = new Date();
       await odRequest.save();
 
@@ -1118,6 +1164,7 @@ router.put(
 
       odRequest.status = "rejected";
       odRequest.advisorComment = req.body.comment || "";
+      odRequest.approverName = req.body.approverName || req.user.name || "";
       await odRequest.save();
 
       console.log("Request rejected by advisor:", odRequest._id);
@@ -1594,9 +1641,13 @@ const generateApprovedPDF = async (odRequest, outputPath) => {
       ).toLocaleDateString()}`
     );
 
+    // Show approverName if present, else fallback to classAdvisor.name
+    const advisorDisplayName = odRequest.approverName && odRequest.approverName.trim().length > 0
+      ? odRequest.approverName
+      : (odRequest.classAdvisor.name || "");
     drawLabeledRow(
       "Authority Sanctioning the OD:",
-      `${odRequest.classAdvisor.name} (Class Advisor) and ${odRequest.hod.name} (HOD)`
+      `${advisorDisplayName} (Class Advisor) and ${odRequest.hod.name} (HOD)`
     );
     drawLabeledRow("Date of Sanction:", new Date().toLocaleDateString());
 
@@ -1637,7 +1688,7 @@ const generateApprovedPDF = async (odRequest, outputPath) => {
     // Header row for signatures
     drawTableRowContent(
       doc,
-      ["STUDENT", "CLASS ADVISOR", "HOD", "DEAN APPROVAL"],
+      ["STUDENT", "for CLASS ADVISOR", "HOD", "DEAN APPROVAL"],
       [colWidth, colWidth, colWidth, colWidth],
       sigX,
       sigY,
@@ -1661,7 +1712,7 @@ const generateApprovedPDF = async (odRequest, outputPath) => {
     doc.y = sigDataY;
     doc
       .font("Helvetica")
-      .text(`Name: ${odRequest.classAdvisor.name}`, textOptions);
+      .text(`Name: ${advisorDisplayName}`, textOptions);
     doc.moveDown(0.5);
     doc.text(
       `Date: ${

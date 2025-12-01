@@ -26,6 +26,7 @@ app.use("/api/od-requests", require("./routes/odRequests"));
 const adminRoutes = require("./routes/admin");
 app.use("/api/admin", adminRoutes);
 app.use("/api/settings", settingsRoutes);
+app.use("/api/forgot-password", require("./routes/forgotPassword"));
 
 // Serve static files from the uploads directory
 app.use(
@@ -38,6 +39,29 @@ app.use(
     },
   })
 );
+
+// Serve static files from the assets directory
+app.use(
+  "/assets",
+  express.static(path.join(__dirname, "assets"), {
+    setHeaders: (res, path) => {
+      // Set CORS headers for asset files
+      res.set("Access-Control-Allow-Origin", "*");
+      res.set("Cross-Origin-Resource-Policy", "cross-origin");
+    },
+  })
+);
+
+// Test route to verify assets are being served
+app.get("/api/admin/test-assets", (req, res) => {
+  const assetsPath = path.join(__dirname, "assets");
+  fs.readdir(assetsPath, (err, files) => {
+    if (err) {
+      return res.status(500).json({ error: "Failed to read assets directory" });
+    }
+    res.json({ files, path: assetsPath });
+  });
+});
 
 // Error handling middleware
 app.use(errorHandler);
