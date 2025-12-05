@@ -65,14 +65,15 @@ const ForgotPassword = () => {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
-      <Paper elevation={3} sx={{ p: 4, mt: 8, background: 'linear-gradient(135deg, #4a90e2 0%, #283e51 100%)' }}>
-        <Typography variant="h4" gutterBottom align="center" sx={{ color: '#fff', fontWeight: 700 }}>
-          Forgot User / Set New Password
-        </Typography>
+    <div style={{ minHeight: '100vh', background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+      <Container maxWidth="sm">
+        <Backdrop open={loading} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: 'rgba(13, 59, 102, 0.7)' }}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        <Paper elevation={3} sx={{ p: 4, borderRadius: '12px', boxShadow: '0 4px 12px rgba(13, 59, 102, 0.12)' }}>
+          <Typography variant="h4" gutterBottom align="center" sx={{ color: '#0D3B66', fontWeight: 700, mb: 3, fontFamily: "'Poppins', 'Lato', sans-serif" }}>
+            Forgot User / Set New Password
+          </Typography>
         {step === 1 && (
           <Box component="form" onSubmit={handleRequestOtp}>
             <TextField
@@ -91,7 +92,7 @@ const ForgotPassword = () => {
               color="primary"
               fullWidth
               size="large"
-              sx={{ mt: 3 }}
+              sx={{ mt: 3, mb: 2, py: 1.5 }}
               disabled={loading}
             >
               {loading ? 'Processing...' : 'Send OTP'}
@@ -109,6 +110,7 @@ const ForgotPassword = () => {
               margin="normal"
               required
               disabled={loading}
+              sx={{ mb: 2 }}
             />
             <TextField
               fullWidth
@@ -120,6 +122,7 @@ const ForgotPassword = () => {
               required
               disabled={loading}
               autoComplete="new-password"
+              sx={{ mb: 2 }}
             />
             <TextField
               fullWidth
@@ -131,6 +134,7 @@ const ForgotPassword = () => {
               required
               disabled={loading}
               autoComplete="new-password"
+              sx={{ mb: 2 }}
             />
             <Button
               type="submit"
@@ -138,7 +142,7 @@ const ForgotPassword = () => {
               color="primary"
               fullWidth
               size="large"
-              sx={{ mt: 3 }}
+              sx={{ mt: 3, mb: 2, py: 1.5 }}
               disabled={loading}
             >
               {loading ? 'Processing...' : 'Reset Password'}
@@ -146,12 +150,13 @@ const ForgotPassword = () => {
           </Box>
         )}
         {step === 3 && (
-          <Alert severity="success" sx={{ mt: 2 }}>{message}</Alert>
+          <Alert severity="success" sx={{ mt: 2, fontFamily: "'Poppins', 'Lato', sans-serif" }}>{message}</Alert>
         )}
-        {message && step !== 3 && <Alert severity="success" sx={{ mt: 2 }}>{message}</Alert>}
-        {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+        {message && step !== 3 && <Alert severity="success" sx={{ mt: 2, fontFamily: "'Poppins', 'Lato', sans-serif" }}>{message}</Alert>}
+        {error && <Alert severity="error" sx={{ mt: 2, fontFamily: "'Poppins', 'Lato', sans-serif" }}>{error}</Alert>}
       </Paper>
-    </Container>
+      </Container>
+    </div>
   );
 };
 

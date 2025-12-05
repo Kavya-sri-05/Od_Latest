@@ -18,11 +18,14 @@ import ODRequestList from "./components/ODRequestList";
 import FacultyODRequestList from "./components/FacultyODRequestList";
 import HODDashboard from "./components/HODDashboard";
 import LandingPage from "./components/LandingPage";
+import ContributorsPage from "./components/ContributorsPage";
 import { useAuth } from "./contexts/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
 import AdminManagement from "./components/AdminManagement";
 import GuideMe from "./components/GuideMe";
 import ForgotPassword from "./components/ForgotPassword";
+import "./styles/isb-styles.css";
+import "./styles/premium-styles.css";
 import "./styles/components.css";
 import { isAfter, isBefore, isEqual, startOfDay, endOfDay } from "date-fns";
 
@@ -51,6 +54,7 @@ const App = () => {
           >
             <Routes>
               <Route path="/" element={<LandingPage />} />
+              <Route path="/contributors" element={<ContributorsPage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/guide" element={<GuideMe />} />

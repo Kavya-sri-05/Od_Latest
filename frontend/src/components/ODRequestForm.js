@@ -20,11 +20,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  AppBar,
-  Toolbar,
   Backdrop,
   CircularProgress,
 } from "@mui/material";
+import SharedNavbar from "./SharedNavbar";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -213,41 +212,56 @@ const ODRequestForm = () => {
   };
 
   return (
-    <Box display="flex" flexDirection="column" minHeight="100vh">
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Submit OD Request
-          </Typography>
-          <Button 
-            color="inherit" 
-            onClick={() => navigate("/guide")}
-            sx={{ mr: 2 }}
+    <Box display="flex" flexDirection="column" minHeight="100vh" sx={{ background: '#F8FAFC' }}>
+      <SharedNavbar title="Submit OD Request" />
+      <Container maxWidth="md" sx={{ flex: 1, py: 4, px: { xs: 2, sm: 3 } }}>
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            p: { xs: 3, sm: 5 }, 
+            mt: 4,
+            borderRadius: '16px',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            border: '1px solid #E5E7EB',
+            background: '#FFFFFF'
+          }}
+        >
+          <Typography 
+            variant="h4" 
+            gutterBottom 
+            align="center"
+            sx={{ 
+              color: '#1A1F36',
+              fontWeight: 800,
+              mb: 3,
+              fontSize: { xs: '1.75rem', sm: '2rem' },
+              letterSpacing: '-0.02em'
+            }}
           >
-            Guide Me
-          </Button>
-          <Button 
-            color="inherit" 
-            onClick={() => navigate("/dashboard")}
-            sx={{ mr: 2 }}
-          >
-            Dashboard
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <Container maxWidth="md" sx={{ flex: 1 }}>
-        <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-          <Typography variant="h4" gutterBottom align="center">
             Submit OD Request
           </Typography>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
+          <Alert 
+            severity="error" 
+            sx={{ 
+              mb: 3,
+              borderRadius: '12px',
+              fontFamily: "'Poppins', 'Inter', sans-serif"
+            }}
+          >
             {error}
           </Alert>
         )}
         {success && (
-          <Alert severity="success" sx={{ mb: 2 }}>
+          <Alert 
+            severity="success" 
+            sx={{ 
+              mb: 3,
+              borderRadius: '12px',
+              fontFamily: "'Poppins', 'Inter', sans-serif"
+            }}
+          >
             {success}
           </Alert>
         )}
@@ -262,6 +276,15 @@ const ODRequestForm = () => {
                 value={formData.eventName}
                 onChange={handleChange}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '12px',
+                    fontSize: '0.9375rem',
+                    '&:hover fieldset': { borderColor: '#0077B6' },
+                    '&.Mui-focused fieldset': { borderColor: '#0077B6', borderWidth: '2px' }
+                  },
+                  '& .MuiInputLabel-root': { fontSize: '0.9375rem', fontWeight: 500 }
+                }}
               />
             </Grid>
 
@@ -387,11 +410,29 @@ const ODRequestForm = () => {
                 multiline
                 rows={4}
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '12px',
+                    fontSize: '0.9375rem',
+                    '&:hover fieldset': { borderColor: '#0077B6' },
+                    '&.Mui-focused fieldset': { borderColor: '#0077B6', borderWidth: '2px' }
+                  },
+                  '& .MuiInputLabel-root': { fontSize: '0.9375rem', fontWeight: 500 }
+                }}
               />
             </Grid>
 
             <Grid item xs={12}>
-              <Typography variant="subtitle1" gutterBottom>
+              <Typography 
+                variant="subtitle1" 
+                gutterBottom
+                sx={{
+                  color: '#1A1F36',
+                  fontWeight: 600,
+                  mb: 2,
+                  fontFamily: "'Poppins', 'Inter', sans-serif"
+                }}
+              >
                 Upload Event Brochure (PDF, max 1MB)
               </Typography>
               <input
@@ -399,10 +440,25 @@ const ODRequestForm = () => {
                 type="file"
                 accept=".pdf,application/pdf"
                 onChange={handleBrochureChange}
-                style={{ marginBottom: "1rem" }}
+                style={{ 
+                  marginBottom: "1rem",
+                  padding: '0.75rem',
+                  borderRadius: '12px',
+                  border: '2px solid #E5E7EB',
+                  width: '100%',
+                  fontFamily: "'Poppins', 'Inter', sans-serif"
+                }}
               />
               {brochureError && (
-                <Alert severity="warning" sx={{ mt: 1, mb: 1 }}>
+                <Alert 
+                  severity="warning" 
+                  sx={{ 
+                    mt: 1, 
+                    mb: 1,
+                    borderRadius: '12px',
+                    fontFamily: "'Poppins', 'Inter', sans-serif"
+                  }}
+                >
                   {brochureError}
                 </Alert>
               )}
@@ -416,10 +472,15 @@ const ODRequestForm = () => {
                     name="isEmergency"
                     checked={formData.isEmergency}
                     onChange={handleChange}
-                    style={{ marginRight: 8 }}
+                    style={{ marginRight: 8, width: '18px', height: '18px' }}
                   />
                 }
                 label="Emergency (Directly forward to Admin)"
+                sx={{
+                  fontFamily: "'Poppins', 'Inter', sans-serif",
+                  color: '#1A1F36',
+                  fontWeight: 500
+                }}
               />
             </Grid>
 
@@ -427,12 +488,34 @@ const ODRequestForm = () => {
               <Button
                 type="submit"
                 variant="contained"
-                color="primary"
                 fullWidth
                 size="large"
                 disabled={!!brochureError || isSubmitting}
+                sx={{
+                  py: 1.75,
+                  mt: 2,
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #0D3B66 0%, #0077B6 100%)',
+                  color: '#FFFFFF',
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  fontFamily: "'Poppins', 'Inter', sans-serif",
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #0a2d4d 0%, #006699 100%)',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                    transform: 'translateY(-2px)',
+                    color: '#FFFFFF'
+                  },
+                  '&:disabled': {
+                    background: '#9CA3AF',
+                    color: '#FFFFFF'
+                  },
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
               >
-                Submit Request
+                {isSubmitting ? 'Submitting...' : 'Submit Request'}
               </Button>
             </Grid>
           </Grid>
@@ -472,7 +555,12 @@ const ODRequestForm = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setRequestDialogOpen(false)}>Cancel</Button>
+          <Button 
+            onClick={() => setRequestDialogOpen(false)}
+            sx={{ color: '#1A1F36' }}
+          >
+            Cancel
+          </Button>
           <Button
             onClick={async () => {
               setRequestEventTypeMsg("");
@@ -492,6 +580,15 @@ const ODRequestForm = () => {
                 setRequestEventTypeMsg(
                   err.response?.data?.message || "Failed to submit request."
                 );
+              }
+            }}
+            variant="contained"
+            sx={{
+              background: 'linear-gradient(135deg, #0D3B66 0%, #0077B6 100%)',
+              color: '#FFFFFF',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #0a2d4d 0%, #006699 100%)',
+                color: '#FFFFFF'
               }
             }}
           >

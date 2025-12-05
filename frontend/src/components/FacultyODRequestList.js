@@ -21,11 +21,10 @@ import {
   Chip,
   IconButton,
   Tooltip,
-  AppBar,
-  Toolbar,
   CircularProgress,
   Backdrop,
 } from "@mui/material";
+import SharedNavbar from "./SharedNavbar";
 import {
   Check as CheckIcon,
   Close as CloseIcon,
@@ -207,61 +206,87 @@ const FacultyODRequestList = () => {
   };
 
   return (
-    <Box display="flex" flexDirection="column" minHeight="100vh">
+    <Box display="flex" flexDirection="column" minHeight="100vh" sx={{ background: '#F8FAFC' }}>
       {/* Full-screen Processing Backdrop for all actions */}
       <Backdrop
         sx={{
           color: "#fff",
           zIndex: (theme) => theme.zIndex.drawer + 1,
-          backdropFilter: "blur(4px)",
-          backgroundColor: "rgba(0, 0, 0, 0.7)",
+          backdropFilter: "blur(8px)",
+          backgroundColor: "rgba(13, 59, 102, 0.8)",
         }}
         open={actionLoading}
       >
         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2 }}>
           <CircularProgress color="inherit" size={60} />
-          <Typography variant="h5">Processing...</Typography>
+          <Typography 
+            variant="h5"
+            sx={{ fontFamily: "'Poppins', 'Inter', sans-serif", fontWeight: 600 }}
+          >
+            Processing...
+          </Typography>
         </Box>
       </Backdrop>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Faculty Dashboard
-          </Typography>
-          <Button
-            color="inherit"
-            onClick={() => navigate("/guide")}
-            sx={{ mr: 2 }}
+      <SharedNavbar title="Faculty Dashboard" />
+      <Container maxWidth="lg" sx={{ flex: 1, py: 4, px: { xs: 2, sm: 3 } }}>
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            p: { xs: 3, sm: 4 }, 
+            mt: 4,
+            borderRadius: '16px',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            border: '1px solid #E5E7EB',
+            background: '#FFFFFF'
+          }}
+        >
+          <Typography 
+            variant="h4" 
+            gutterBottom
+            sx={{ 
+              color: '#1A1F36',
+              fontWeight: 800,
+              mb: 3,
+              fontSize: { xs: '1.75rem', sm: '2rem' },
+              letterSpacing: '-0.02em',
+              fontFamily: "'Poppins', 'Inter', sans-serif"
+            }}
           >
-            Guide Me
-          </Button>
-          <Button
-            color="inherit"
-            onClick={() => navigate("/dashboard")}
-            sx={{ mr: 2 }}
-          >
-            Dashboard
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <Container maxWidth="lg" sx={{ flex: 1 }}>
-        <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-          <Typography variant="h4" gutterBottom>
             Faculty Dashboard
           </Typography>
 
           {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
+            <Alert 
+              severity="error" 
+              sx={{ 
+                mb: 3,
+                borderRadius: '12px',
+                fontFamily: "'Poppins', 'Inter', sans-serif"
+              }}
+            >
               {error}
             </Alert>
           )}
           {success && (
-            <Alert severity="success" sx={{ mb: 2 }}>
+            <Alert 
+              severity="success" 
+              sx={{ 
+                mb: 3,
+                borderRadius: '12px',
+                fontFamily: "'Poppins', 'Inter', sans-serif"
+              }}
+            >
               {success}
             </Alert>
           )}
 
-          <TableContainer>
+          <TableContainer
+            sx={{
+              borderRadius: '12px',
+              border: '1px solid #E5E7EB',
+              overflow: 'hidden'
+            }}
+          >
             <Table>
               <TableHead>
                 <TableRow>
@@ -336,7 +361,16 @@ const FacultyODRequestList = () => {
                               "_blank"
                             )
                           }
-                          sx={{ ml: 1 }}
+                          sx={{ 
+                            ml: 1,
+                            color: '#0077B6',
+                            borderColor: '#0077B6',
+                            '&:hover': {
+                              borderColor: '#0077B6',
+                              background: 'rgba(0, 119, 182, 0.1)',
+                              color: '#0077B6'
+                            }
+                          }}
                         >
                           View Brochure
                         </Button>
@@ -350,6 +384,14 @@ const FacultyODRequestList = () => {
                             color="success"
                             size="small"
                             onClick={() => handleApprove(request._id)}
+                            sx={{
+                              background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                              color: '#FFFFFF',
+                              '&:hover': {
+                                background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                                color: '#FFFFFF'
+                              }
+                            }}
                           >
                             Approve
                           </Button>
@@ -358,6 +400,14 @@ const FacultyODRequestList = () => {
                             color="error"
                             size="small"
                             onClick={() => handleReject(request._id)}
+                            sx={{
+                              background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
+                              color: '#FFFFFF',
+                              '&:hover': {
+                                background: 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)',
+                                color: '#FFFFFF'
+                              }
+                            }}
                           >
                             Reject
                           </Button>
@@ -376,6 +426,14 @@ const FacultyODRequestList = () => {
                                 onClick={() =>
                                   handleProofVerification(request._id, true)
                                 }
+                                sx={{
+                                  background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                                  color: '#FFFFFF',
+                                  '&:hover': {
+                                    background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                                    color: '#FFFFFF'
+                                  }
+                                }}
                               >
                                 Verify Proof
                               </Button>
@@ -386,6 +444,14 @@ const FacultyODRequestList = () => {
                                 onClick={() =>
                                   handleProofVerification(request._id, false)
                                 }
+                                sx={{
+                                  background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
+                                  color: '#FFFFFF',
+                                  '&:hover': {
+                                    background: 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)',
+                                    color: '#FFFFFF'
+                                  }
+                                }}
                               >
                                 Reject Proof
                               </Button>
@@ -397,6 +463,15 @@ const FacultyODRequestList = () => {
                             onClick={() =>
                               handleViewProof(request.proofDocument)
                             }
+                            sx={{
+                              color: '#0077B6',
+                              borderColor: '#0077B6',
+                              '&:hover': {
+                                borderColor: '#0077B6',
+                                background: 'rgba(0, 119, 182, 0.1)',
+                                color: '#0077B6'
+                              }
+                            }}
                           >
                             View Proof
                           </Button>
@@ -433,13 +508,34 @@ const FacultyODRequestList = () => {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleDialogClose} disabled={loading}>
+            <Button 
+              onClick={handleDialogClose} 
+              disabled={loading}
+              sx={{ color: '#1A1F36' }}
+            >
               Cancel
             </Button>
             <Button
               onClick={handleSubmit}
               color={action === "approve" ? "success" : "error"}
               disabled={loading || !approverName}
+              variant="contained"
+              sx={{
+                background: action === "approve" 
+                  ? 'linear-gradient(135deg, #10B981 0%, #059669 100%)'
+                  : 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
+                color: '#FFFFFF',
+                '&:hover': {
+                  background: action === "approve"
+                    ? 'linear-gradient(135deg, #059669 0%, #047857 100%)'
+                    : 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)',
+                  color: '#FFFFFF'
+                },
+                '&:disabled': {
+                  background: '#9CA3AF',
+                  color: '#FFFFFF'
+                }
+              }}
             >
               {action === "approve" ? "Approve" : "Reject"}
             </Button>
@@ -500,7 +596,19 @@ const FacultyODRequestList = () => {
             )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setViewProofDialogOpen(false)}>Close</Button>
+            <Button 
+              onClick={() => setViewProofDialogOpen(false)}
+              sx={{
+                background: 'linear-gradient(135deg, #0D3B66 0%, #0077B6 100%)',
+                color: '#FFFFFF',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #0a2d4d 0%, #006699 100%)',
+                  color: '#FFFFFF'
+                }
+              }}
+            >
+              Close
+            </Button>
           </DialogActions>
         </Dialog>
       </Container>

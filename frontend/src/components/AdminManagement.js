@@ -22,10 +22,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  AppBar,
-  Toolbar,
   Backdrop,
+  Container,
 } from "@mui/material";
+import SharedNavbar from "./SharedNavbar";
 import { Search as SearchIcon } from "@mui/icons-material";
 import { Pie } from "react-chartjs-2";
 import {
@@ -1020,7 +1020,7 @@ const AdminManagement = () => {
   }
 
   return (
-    <Box display="flex" flexDirection="column" minHeight="100vh">
+    <Box display="flex" flexDirection="column" minHeight="100vh" sx={{ background: '#F8FAFC' }}>
       {/* Processing Backdrop with Spinner */}
       <Backdrop
         sx={{
@@ -1045,31 +1045,23 @@ const AdminManagement = () => {
         </Box>
       </Backdrop>
 
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+      <SharedNavbar title="Admin Management" />
+      <Box sx={{ background: '#F8FAFC', minHeight: '100vh', py: 4, px: { xs: 2, sm: 3 } }}>
+        <Container maxWidth="xl">
+          <Typography 
+            variant="h4" 
+            gutterBottom
+            sx={{ 
+              color: '#1A1F36',
+              fontWeight: 800,
+              mb: 4,
+              fontSize: { xs: '1.75rem', sm: '2rem' },
+              letterSpacing: '-0.02em',
+              fontFamily: "'Poppins', 'Inter', sans-serif"
+            }}
+          >
             Admin Management
           </Typography>
-          <Button 
-            color="inherit" 
-            onClick={() => navigate("/guide")}
-            sx={{ mr: 2 }}
-          >
-            Guide Me
-          </Button>
-          <Button 
-            color="inherit" 
-            onClick={() => navigate("/dashboard")}
-            sx={{ mr: 2 }}
-          >
-            Dashboard
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <Box p={3}>
-        <Typography variant="h4" gutterBottom>
-          Admin Management
-        </Typography>
 
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
@@ -1620,6 +1612,7 @@ const AdminManagement = () => {
             </Paper>
           )}
         </Box>
+        </Container>
       </Box>
 
       {/* Edit Event Type Dialog */}

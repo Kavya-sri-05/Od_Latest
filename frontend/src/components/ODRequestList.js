@@ -20,11 +20,10 @@ import {
   Box,
   Chip,
   Autocomplete,
-  AppBar,
-  Toolbar,
   Backdrop,
   CircularProgress,
 } from "@mui/material";
+import SharedNavbar from "./SharedNavbar";
 import { Download as DownloadIcon } from "@mui/icons-material";
 import axios from "axios";
 
@@ -325,46 +324,67 @@ const ODRequestList = () => {
           <Typography variant="h5">Processing...</Typography>
         </Box>
       </Backdrop>
-      <Box display="flex" flexDirection="column" minHeight="100vh">
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            My OD Requests
-          </Typography>
-          <Button 
-            color="inherit" 
-            onClick={() => navigate("/guide")}
-            sx={{ mr: 2 }}
+      <Box display="flex" flexDirection="column" minHeight="100vh" sx={{ background: '#F8FAFC' }}>
+      <SharedNavbar title="My OD Requests" />
+      <Container maxWidth="lg" sx={{ flex: 1, py: 4, px: { xs: 2, sm: 3 } }}>
+        <Paper 
+          elevation={0} 
+          sx={{ 
+            p: { xs: 3, sm: 4 }, 
+            mt: 4,
+            borderRadius: '16px',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            border: '1px solid #E5E7EB',
+            background: '#FFFFFF'
+          }}
+        >
+          <Typography 
+            variant="h4" 
+            gutterBottom
+            sx={{ 
+              color: '#1A1F36',
+              fontWeight: 800,
+              mb: 3,
+              fontSize: { xs: '1.75rem', sm: '2rem' },
+              letterSpacing: '-0.02em',
+              fontFamily: "'Poppins', 'Inter', sans-serif"
+            }}
           >
-            Guide Me
-          </Button>
-          <Button 
-            color="inherit" 
-            onClick={() => navigate("/dashboard")}
-            sx={{ mr: 2 }}
-          >
-            Dashboard
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <Container maxWidth="lg" sx={{ flex: 1 }}>
-        <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
-          <Typography variant="h4" gutterBottom>
             My OD Requests
           </Typography>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
+          <Alert 
+            severity="error" 
+            sx={{ 
+              mb: 3,
+              borderRadius: '12px',
+              fontFamily: "'Poppins', 'Inter', sans-serif"
+            }}
+          >
             {error}
           </Alert>
         )}
         {success && (
-          <Alert severity="success" sx={{ mb: 2 }}>
+          <Alert 
+            severity="success" 
+            sx={{ 
+              mb: 3,
+              borderRadius: '12px',
+              fontFamily: "'Poppins', 'Inter', sans-serif"
+            }}
+          >
             {success}
           </Alert>
         )}
 
-        <TableContainer>
+        <TableContainer
+          sx={{
+            borderRadius: '12px',
+            border: '1px solid #E5E7EB',
+            overflow: 'hidden'
+          }}
+        >
           <Table>
             <TableHead>
               <TableRow>
@@ -418,7 +438,16 @@ const ODRequestList = () => {
                             "_blank"
                           )
                         }
-                        sx={{ ml: 1 }}
+                        sx={{ 
+                          ml: 1,
+                          color: '#0077B6',
+                          borderColor: '#0077B6',
+                          '&:hover': {
+                            borderColor: '#0077B6',
+                            background: 'rgba(0, 119, 182, 0.1)',
+                            color: '#0077B6'
+                          }
+                        }}
                       >
                         View Brochure
                       </Button>
@@ -436,6 +465,14 @@ const ODRequestList = () => {
                               setSelectedRequest(request);
                               setProofDialogOpen(true);
                             }}
+                            sx={{
+                              background: 'linear-gradient(135deg, #0D3B66 0%, #0077B6 100%)',
+                              color: '#FFFFFF',
+                              '&:hover': {
+                                background: 'linear-gradient(135deg, #0a2d4d 0%, #006699 100%)',
+                                color: '#FFFFFF'
+                              }
+                            }}
                           >
                             Submit Proof
                           </Button>
@@ -447,6 +484,14 @@ const ODRequestList = () => {
                           size="small"
                           onClick={() => handleDownloadPDF(request._id)}
                           startIcon={<DownloadIcon />}
+                          sx={{
+                            background: '#6B7280',
+                            color: '#FFFFFF',
+                            '&:hover': {
+                              background: '#4B5563',
+                              color: '#FFFFFF'
+                            }
+                          }}
                         >
                           Download PDF
                         </Button>
@@ -456,6 +501,15 @@ const ODRequestList = () => {
                           variant="outlined"
                           size="small"
                           onClick={() => handleViewProof(request.proofDocument)}
+                          sx={{
+                            color: '#0077B6',
+                            borderColor: '#0077B6',
+                            '&:hover': {
+                              borderColor: '#0077B6',
+                              background: 'rgba(0, 119, 182, 0.1)',
+                              color: '#0077B6'
+                            }
+                          }}
                         >
                           View Proof
                         </Button>
@@ -506,11 +560,24 @@ const ODRequestList = () => {
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseProofDialog}>Cancel</Button>
+            <Button 
+              onClick={handleCloseProofDialog}
+              sx={{ color: '#1A1F36' }}
+            >
+              Cancel
+            </Button>
             <Button
               onClick={handleSubmitProof}
               variant="contained"
               color="primary"
+              sx={{
+                background: 'linear-gradient(135deg, #0D3B66 0%, #0077B6 100%)',
+                color: '#FFFFFF',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #0a2d4d 0%, #006699 100%)',
+                  color: '#FFFFFF'
+                }
+              }}
             >
               Submit
             </Button>
@@ -569,7 +636,19 @@ const ODRequestList = () => {
             )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setViewProofDialogOpen(false)}>Close</Button>
+            <Button 
+              onClick={() => setViewProofDialogOpen(false)}
+              sx={{
+                background: 'linear-gradient(135deg, #0D3B66 0%, #0077B6 100%)',
+                color: '#FFFFFF',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #0a2d4d 0%, #006699 100%)',
+                  color: '#FFFFFF'
+                }
+              }}
+            >
+              Close
+            </Button>
           </DialogActions>
         </Dialog>
       </Paper>

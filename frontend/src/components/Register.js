@@ -21,6 +21,7 @@ import {
 } from "@mui/material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { useAuth } from "../contexts/AuthContext";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 const Register = () => {
@@ -103,59 +104,159 @@ const Register = () => {
   };
 
   return (
-    <Container maxWidth="sm">
+    <div style={{ 
+      minHeight: '100vh', 
+      background: 'linear-gradient(135deg, #F8FAFC 0%, #E6F4F8 50%, #F1F5F9 100%)',
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center', 
+      padding: '2rem',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {/* Decorative Background Elements */}
+      <div style={{
+        position: 'absolute',
+        top: '-50%',
+        right: '-10%',
+        width: '600px',
+        height: '600px',
+        background: 'linear-gradient(135deg, rgba(13, 59, 102, 0.1) 0%, rgba(0, 119, 182, 0.05) 100%)',
+        borderRadius: '50%',
+        filter: 'blur(80px)',
+        zIndex: 0
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '-30%',
+        left: '-10%',
+        width: '500px',
+        height: '500px',
+        background: 'linear-gradient(135deg, rgba(0, 119, 182, 0.08) 0%, rgba(0, 168, 232, 0.05) 100%)',
+        borderRadius: '50%',
+        filter: 'blur(80px)',
+        zIndex: 0
+      }} />
+
       {/* Loading Backdrop */}
       <Backdrop
         sx={{
           color: "#fff",
           zIndex: (theme) => theme.zIndex.drawer + 1,
-          backdropFilter: "blur(4px)",
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          backdropFilter: "blur(8px)",
+          backgroundColor: "rgba(13, 59, 102, 0.8)",
         }}
         open={loading}
       >
-        <CircularProgress color="inherit" />
+        <CircularProgress color="inherit" size={48} />
       </Backdrop>
 
-      <Paper elevation={3} sx={{ p: 4, mt: 8 }}>
-        <Typography variant="h4" gutterBottom align="center">
-          Register
-        </Typography>
+      <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
+        <Paper elevation={0} sx={{ 
+          p: { xs: 3, sm: 5 }, 
+          borderRadius: '24px', 
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.8)',
+          maxHeight: '90vh',
+          overflowY: 'auto'
+        }}>
+          {/* Header Section */}
+          <Box sx={{ textAlign: 'center', mb: 4 }}>
+            <Typography variant="h4" sx={{ 
+              color: '#0D3B66', 
+              fontWeight: 800, 
+              mb: 1,
+              fontSize: { xs: '1.75rem', sm: '2rem' },
+              letterSpacing: '-0.02em'
+            }}>
+              Create Account
+            </Typography>
+            <Typography variant="body1" sx={{ 
+              color: '#6B7280', 
+              fontSize: '0.9375rem',
+              fontWeight: 400
+            }}>
+              Join us to get started with your OD requests
+            </Typography>
+          </Box>
 
-        <Box component="form" onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="Name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            margin="normal"
-            required
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+            <TextField
+              fullWidth
+              label="Full Name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              disabled={loading}
+              sx={{ 
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '12px',
+                  fontSize: '0.9375rem',
+                  '&:hover fieldset': { borderColor: '#0077B6' },
+                  '&.Mui-focused fieldset': { borderColor: '#0077B6', borderWidth: '2px' }
+                },
+                '& .MuiInputLabel-root': { fontSize: '0.9375rem', fontWeight: 500 }
+              }}
+            />
+            <TextField
+              fullWidth
+              label="Email Address"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              disabled={loading}
+              sx={{ 
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '12px',
+                  fontSize: '0.9375rem',
+                  '&:hover fieldset': { borderColor: '#0077B6' },
+                  '&.Mui-focused fieldset': { borderColor: '#0077B6', borderWidth: '2px' }
+                },
+                '& .MuiInputLabel-root': { fontSize: '0.9375rem', fontWeight: 500 }
+              }}
+            />
+            <TextField
+              fullWidth
+              label="Password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              disabled={loading}
+              sx={{ 
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '12px',
+                  fontSize: '0.9375rem',
+                  '&:hover fieldset': { borderColor: '#0077B6' },
+                  '&.Mui-focused fieldset': { borderColor: '#0077B6', borderWidth: '2px' }
+                },
+                '& .MuiInputLabel-root': { fontSize: '0.9375rem', fontWeight: 500 }
+              }}
+            />
+          <FormControl 
+            fullWidth 
+            required 
             disabled={loading}
-          />
-          <TextField
-            fullWidth
-            label="Email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            margin="normal"
-            required
-            disabled={loading}
-          />
-          <TextField
-            fullWidth
-            label="Password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            margin="normal"
-            required
-            disabled={loading}
-          />
-          <FormControl fullWidth margin="normal" required disabled={loading}>
+            sx={{ 
+              mb: 3,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '12px',
+                fontSize: '0.9375rem',
+                '&:hover fieldset': { borderColor: '#0077B6' },
+                '&.Mui-focused fieldset': { borderColor: '#0077B6', borderWidth: '2px' }
+              },
+              '& .MuiInputLabel-root': { fontSize: '0.9375rem', fontWeight: 500 }
+            }}
+          >
             <InputLabel>Role</InputLabel>
             <Select
               name="role"
@@ -176,9 +277,18 @@ const Register = () => {
               name="department"
               value={formData.department || ""}
               onChange={handleChange}
-              margin="normal"
               required
               disabled={loading}
+              sx={{ 
+                mb: 3,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '12px',
+                  fontSize: '0.9375rem',
+                  '&:hover fieldset': { borderColor: '#0077B6' },
+                  '&.Mui-focused fieldset': { borderColor: '#0077B6', borderWidth: '2px' }
+                },
+                '& .MuiInputLabel-root': { fontSize: '0.9375rem', fontWeight: 500 }
+              }}
             />
           )}
           {formData.role === "student" && (
@@ -189,20 +299,40 @@ const Register = () => {
                 name="registerNo"
                 value={formData.registerNo}
                 onChange={handleChange}
-                margin="normal"
                 required
                 disabled={loading}
+                sx={{ 
+                  mb: 3,
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '12px',
+                    fontSize: '0.9375rem',
+                    '&:hover fieldset': { borderColor: '#0077B6' },
+                    '&.Mui-focused fieldset': { borderColor: '#0077B6', borderWidth: '2px' }
+                  },
+                  '& .MuiInputLabel-root': { fontSize: '0.9375rem', fontWeight: 500 }
+                }}
               />
               <TextField
                 fullWidth
                 label="Department"
                 name="department"
                 value="Computer Science and Engineering"
-                margin="normal"
                 required
                 disabled
+                sx={{ 
+                  mb: 3,
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '12px',
+                    fontSize: '0.9375rem',
+                    backgroundColor: '#F3F4F6',
+                    '& .MuiInputBase-input': {
+                      color: '#1A1F36 !important',
+                      WebkitTextFillColor: '#1A1F36 !important'
+                    }
+                  },
+                  '& .MuiInputLabel-root': { fontSize: '0.9375rem', fontWeight: 500 }
+                }}
               />
-
               <TextField
                 fullWidth
                 label="Year of Joining"
@@ -210,7 +340,6 @@ const Register = () => {
                 type="number"
                 value={formData.yearOfJoin}
                 onChange={handleChange}
-                margin="normal"
                 required
                 disabled={loading}
                 helperText="Enter the year you joined the college (e.g., 2023)"
@@ -218,8 +347,33 @@ const Register = () => {
                   min: 2020,
                   max: new Date().getFullYear(),
                 }}
+                sx={{ 
+                  mb: 3,
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '12px',
+                    fontSize: '0.9375rem',
+                    '&:hover fieldset': { borderColor: '#0077B6' },
+                    '&.Mui-focused fieldset': { borderColor: '#0077B6', borderWidth: '2px' }
+                  },
+                  '& .MuiInputLabel-root': { fontSize: '0.9375rem', fontWeight: 500 },
+                  '& .MuiFormHelperText-root': { fontSize: '0.8125rem', color: '#6B7280' }
+                }}
               />
-              <FormControl fullWidth margin="normal" required disabled={loading}>
+              <FormControl 
+                fullWidth 
+                required 
+                disabled={loading}
+                sx={{ 
+                  mb: 3,
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '12px',
+                    fontSize: '0.9375rem',
+                    '&:hover fieldset': { borderColor: '#0077B6' },
+                    '&.Mui-focused fieldset': { borderColor: '#0077B6', borderWidth: '2px' }
+                  },
+                  '& .MuiInputLabel-root': { fontSize: '0.9375rem', fontWeight: 500 }
+                }}
+              >
                 <InputLabel>Faculty Advisor</InputLabel>
                 <Select
                   name="facultyAdvisor"
@@ -239,16 +393,60 @@ const Register = () => {
           <Button
             type="submit"
             variant="contained"
-            color="primary"
             fullWidth
             size="large"
-            sx={{ mt: 3 }}
             disabled={loading}
+            sx={{ 
+              py: 1.75,
+              mb: 3,
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #0D3B66 0%, #0077B6 50%, #00A8E8 100%)',
+              fontSize: '1rem',
+              fontWeight: 600,
+              textTransform: 'none',
+              letterSpacing: '-0.01em',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #0a2d4d 0%, #006699 50%, #0099cc 100%)',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                transform: 'translateY(-2px)',
+              },
+              '&:disabled': {
+                background: '#9CA3AF',
+              },
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+            }}
           >
-            {loading ? "Registering..." : "Register"}
+            {loading ? "Registering..." : "Create Account"}
           </Button>
+          <Box sx={{ 
+            textAlign: 'center', 
+            pt: 3,
+            borderTop: '1px solid #E5E7EB'
+          }}>
+            <Typography variant="body2" sx={{ 
+              color: '#6B7280',
+              fontSize: '0.875rem'
+            }}>
+              Already have an account?{' '}
+              <Link 
+                to="/login" 
+                style={{ 
+                  color: '#0077B6', 
+                  fontWeight: 600, 
+                  textDecoration: 'none',
+                  transition: 'color 0.2s ease'
+                }}
+                onMouseEnter={(e) => e.target.style.color = '#0D3B66'}
+                onMouseLeave={(e) => e.target.style.color = '#0077B6'}
+              >
+                Sign In
+              </Link>
+            </Typography>
+          </Box>
         </Box>
       </Paper>
+      </Container>
 
       {/* Error Dialog */}
       <Dialog
@@ -263,13 +461,14 @@ const Register = () => {
             alignItems: "center",
             gap: 1,
             color: "#d32f2f",
+            fontFamily: "'Poppins', 'Lato', sans-serif",
           }}
         >
           <ErrorOutlineIcon />
           Registration Failed
         </DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
-          <Typography variant="body1" sx={{ whiteSpace: "pre-wrap" }}>
+          <Typography variant="body1" sx={{ whiteSpace: "pre-wrap", color: '#4B4B4B', fontFamily: "'Poppins', 'Lato', sans-serif" }}>
             {error}
           </Typography>
         </DialogContent>
@@ -277,13 +476,13 @@ const Register = () => {
           <Button
             onClick={() => setShowErrorDialog(false)}
             variant="contained"
-            color="error"
+            sx={{ backgroundColor: '#0077B6', '&:hover': { backgroundColor: '#0D3B66' } }}
           >
             OK
           </Button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </div>
   );
 };
 

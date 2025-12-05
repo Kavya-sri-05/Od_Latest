@@ -6,7 +6,7 @@ const Contributors = ({ images }) => {
     <div className="contributors-container visible">
       <h3>CONTRIBUTORS</h3>
       <p>
-        This Student OD Application was created by the following contributors as a summer
+        This Student OD Application was created by the following students as a summer
         internship project:
       </p>
       <div className="contributors-grid">
