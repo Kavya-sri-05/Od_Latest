@@ -168,6 +168,12 @@ const AdminManagement = () => {
   const [viewProofDialogOpen, setViewProofDialogOpen] = useState(false);
   const [selectedProofRequest, setSelectedProofRequest] = useState(null);
 
+  // Forward to HOD dialog states
+  const [forwardToHodDialogOpen, setForwardToHodDialogOpen] = useState(false);
+  const [approverName, setApproverName] = useState("");
+  const [forwardedRequestId, setForwardedRequestId] = useState(null);
+  const [forwardError, setForwardError] = useState("");
+
   const allColumns = [
     { label: "Student Name", key: "studentName" },
     { label: "Roll Number", key: "rollNumber" },
@@ -431,11 +437,23 @@ const AdminManagement = () => {
   });
 
   const handleForwardToHod = async (requestId) => {
+    setForwardedRequestId(requestId);
+    setForwardToHodDialogOpen(true);
+    setApproverName("");
+    setForwardError("");
+  };
+
+  const handleConfirmForwardToHod = async () => {
+    if (!approverName.trim()) {
+      setForwardError("Please enter the class advisor name");
+      return;
+    }
+
     try {
       setProcessingAction(true);
       await axios.put(
-        `${API_BASE_URL}/api/od-requests/${requestId}/forward-to-hod`,
-        {},
+        `${API_BASE_URL}/api/od-requests/${forwardedRequestId}/forward-to-hod`,
+        { classAdvisorName: approverName },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -443,6 +461,10 @@ const AdminManagement = () => {
         }
       );
       setProcessingAction(false);
+      setForwardToHodDialogOpen(false);
+      setApproverName("");
+      setForwardedRequestId(null);
+      setForwardError("");
       fetchAllRequests();
       setError("Request forwarded to HOD successfully!");
     } catch (err) {
@@ -450,6 +472,13 @@ const AdminManagement = () => {
       const errorMsg = getErrorMessage(err, "Failed to forward request to HOD");
       showErrorDialog("Forward to HOD Failed", errorMsg);
     }
+  };
+
+  const handleCloseForwardDialog = () => {
+    setForwardToHodDialogOpen(false);
+    setApproverName("");
+    setForwardedRequestId(null);
+    setForwardError("");
   };
 
   const handleVerifyProof = async (requestId) => {
@@ -1989,6 +2018,46 @@ const AdminManagement = () => {
             color="error"
           >
             OK
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Forward to HOD Dialog */}
+      <Dialog
+        open={forwardToHodDialogOpen}
+        onClose={handleCloseForwardDialog}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Forward to HOD</DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Please enter the name of the class advisor (faculty). This name will
+            appear in the PDF as the class advisor for approval.
+          </Typography>
+          <TextField
+            autoFocus
+            label="Class Advisor Name"
+            fullWidth
+            value={approverName}
+            onChange={(e) => {
+              setApproverName(e.target.value);
+              setForwardError("");
+            }}
+            placeholder="Enter class advisor's name"
+            error={!!forwardError}
+            helperText={forwardError}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseForwardDialog}>Cancel</Button>
+          <Button
+            onClick={handleConfirmForwardToHod}
+            variant="contained"
+            color="primary"
+            disabled={!approverName.trim()}
+          >
+            Forward to HOD
           </Button>
         </DialogActions>
       </Dialog>

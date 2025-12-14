@@ -324,10 +324,10 @@ router.put(
 
     // Prepare emails for all selected staff (notifyFaculty list)
     const facultyEmails = [];
-    
+
     // Add all selected staff from notifyFaculty
     if (odRequest.notifyFaculty?.length) {
-      odRequest.notifyFaculty.forEach(faculty => {
+      odRequest.notifyFaculty.forEach((faculty) => {
         if (faculty.email) {
           facultyEmails.push(faculty.email);
         }
@@ -362,7 +362,7 @@ router.put(
           await updatedRequest.save();
         }
       }
-      
+
       // Only send emails if there are recipients
       if (facultyEmails.length > 0) {
         await sendProofVerificationNotification(
@@ -519,29 +519,29 @@ router.post(
     // Send email to class advisor and admin (HOD) for approval
     try {
       const approverEmails = [];
-      
+
       // Add class advisor
       if (odRequest.classAdvisor && odRequest.classAdvisor.email) {
         approverEmails.push({
           email: odRequest.classAdvisor.email,
           name: odRequest.classAdvisor.name,
-          role: "Class Advisor"
+          role: "Class Advisor",
         });
       }
-      
+
       // Add HOD/Admin
       if (odRequest.hod && odRequest.hod.email) {
         approverEmails.push({
           email: odRequest.hod.email,
           name: odRequest.hod.name,
-          role: "Admin"
+          role: "Admin",
         });
       }
 
       // Send notification to approvers
       if (approverEmails.length > 0) {
         await sendProofVerificationNotification(
-          approverEmails.map(a => a.email),
+          approverEmails.map((a) => a.email),
           {
             name: odRequest.student.name,
             registerNo: odRequest.student.registerNo,
@@ -568,7 +568,10 @@ router.post(
       // Don't block the response if email fails
     }
 
-    res.json({ message: "Proof document submitted successfully to class advisor and admin for approval" });
+    res.json({
+      message:
+        "Proof document submitted successfully to class advisor and admin for approval",
+    });
   })
 );
 
@@ -667,29 +670,43 @@ router.put(
 
     // Preserve the existing facultyAdvisor
     const facultyAdvisor = odRequest.facultyAdvisor;
+    const existingApproverName = odRequest.approverName;
 
     odRequest.hodStatus = status;
     odRequest.remarks = remarks;
     odRequest.updatedAt = Date.now();
     odRequest.facultyAdvisor = facultyAdvisor; // Ensure facultyAdvisor is preserved
+    odRequest.approverName = existingApproverName; // Preserve approverName set by admin or faculty
     odRequest.status = "approved_by_hod";
     odRequest.hodApprovedAt = new Date();
 
     const updatedRequest = await odRequest.save();
 
+    console.log(
+      "ApproverName before PDF generation:",
+      updatedRequest.approverName
+    );
+
+    // Fetch the updated request with all populated fields before generating PDF
+    const populatedRequest = await ODRequest.findById(updatedRequest._id)
+      .populate("student", "name registerNo yearOfJoin currentYear")
+      .populate("classAdvisor", "name")
+      .populate("hod", "name")
+      .populate("notifyFaculty", "name email");
+
     // Generate approved PDF when HOD approves the request
     const approvedPDFPath = path.resolve(
       "uploads/od_letters",
-      `approved_${updatedRequest._id}.pdf`
+      `approved_${populatedRequest._id}.pdf`
     );
-    await generateApprovedPDF(updatedRequest, approvedPDFPath);
+    await generateApprovedPDF(populatedRequest, approvedPDFPath);
 
     // Save the path to the database
-    updatedRequest.approvedPDFPath = approvedPDFPath;
-    await updatedRequest.save();
+    populatedRequest.approvedPDFPath = approvedPDFPath;
+    await populatedRequest.save();
 
-    console.log("OD Request status updated by HOD:", updatedRequest);
-    res.json(updatedRequest);
+    console.log("OD Request status updated by HOD:", populatedRequest);
+    res.json(populatedRequest);
   })
 );
 
@@ -1335,7 +1352,21 @@ router.put(
     odRequest.forwardedToHodAt = Date.now();
     odRequest.lastStatusChangeAt = Date.now();
 
+    // If admin provided a class advisor name, store it as approverName
+    if (
+      req.body.classAdvisorName &&
+      req.body.classAdvisorName.trim().length > 0
+    ) {
+      const trimmedName = req.body.classAdvisorName.trim();
+      odRequest.approverName = trimmedName;
+
+      // Also update the classAdvisor name if it's an object, otherwise create a simple name storage
+      console.log("Admin entered class advisor name:", trimmedName);
+      console.log("Before save - approverName:", odRequest.approverName);
+    }
+
     const updatedRequest = await odRequest.save();
+    console.log("After save - approverName:", updatedRequest.approverName);
     res.json(updatedRequest);
   })
 );
@@ -1642,9 +1673,17 @@ const generateApprovedPDF = async (odRequest, outputPath) => {
     );
 
     // Show approverName if present, else fallback to classAdvisor.name
-    const advisorDisplayName = odRequest.approverName && odRequest.approverName.trim().length > 0
-      ? odRequest.approverName
-      : (odRequest.classAdvisor.name || "");
+    const advisorDisplayName =
+      odRequest.approverName && odRequest.approverName.trim().length > 0
+        ? odRequest.approverName
+        : odRequest.classAdvisor.name || "";
+
+    console.log("PDF Generation - approverName:", odRequest.approverName);
+    console.log(
+      "PDF Generation - classAdvisor.name:",
+      odRequest.classAdvisor.name
+    );
+    console.log("PDF Generation - advisorDisplayName:", advisorDisplayName);
     drawLabeledRow(
       "Authority Sanctioning the OD:",
       `${advisorDisplayName} (Class Advisor) and ${odRequest.hod.name} (HOD)`
@@ -1710,9 +1749,7 @@ const generateApprovedPDF = async (odRequest, outputPath) => {
     // Class Advisor
     doc.x = sigX + colWidth;
     doc.y = sigDataY;
-    doc
-      .font("Helvetica")
-      .text(`Name: ${advisorDisplayName}`, textOptions);
+    doc.font("Helvetica").text(`Name: ${advisorDisplayName}`, textOptions);
     doc.moveDown(0.5);
     doc.text(
       `Date: ${
