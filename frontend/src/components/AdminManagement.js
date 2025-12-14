@@ -60,7 +60,8 @@ const API_BASE_URL = "http://localhost:5001";
 const AdminManagement = () => {
   // Emergency dialog state and handlers
   const [emergencyDialogOpen, setEmergencyDialogOpen] = useState(false);
-  const [selectedEmergencyRequest, setSelectedEmergencyRequest] = useState(null);
+  const [selectedEmergencyRequest, setSelectedEmergencyRequest] =
+    useState(null);
   const [emergencyReason, setEmergencyReason] = useState("");
   const [emergencyError, setEmergencyError] = useState("");
   const [processingAction, setProcessingAction] = useState(false);
@@ -85,7 +86,9 @@ const AdminManagement = () => {
       );
       setRequests((prev) =>
         prev.map((req) =>
-          req._id === selectedEmergencyRequest._id ? { ...req, ...res.data } : req
+          req._id === selectedEmergencyRequest._id
+            ? { ...req, ...res.data }
+            : req
         )
       );
       setEmergencyDialogOpen(false);
@@ -444,10 +447,7 @@ const AdminManagement = () => {
       setError("Request forwarded to HOD successfully!");
     } catch (err) {
       setProcessingAction(false);
-      const errorMsg = getErrorMessage(
-        err,
-        "Failed to forward request to HOD"
-      );
+      const errorMsg = getErrorMessage(err, "Failed to forward request to HOD");
       showErrorDialog("Forward to HOD Failed", errorMsg);
     }
   };
@@ -1020,7 +1020,12 @@ const AdminManagement = () => {
   }
 
   return (
-    <Box display="flex" flexDirection="column" minHeight="100vh" sx={{ background: '#F8FAFC' }}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      minHeight="100vh"
+      sx={{ background: "#F8FAFC" }}
+    >
       {/* Processing Backdrop with Spinner */}
       <Backdrop
         sx={{
@@ -1046,572 +1051,726 @@ const AdminManagement = () => {
       </Backdrop>
 
       <SharedNavbar title="Admin Management" />
-      <Box sx={{ background: '#F8FAFC', minHeight: '100vh', py: 4, px: { xs: 2, sm: 3 } }}>
+      <Box
+        sx={{
+          background: "#F8FAFC",
+          minHeight: "100vh",
+          py: 4,
+          px: { xs: 2, sm: 3 },
+          overflow: "hidden",
+        }}
+      >
         <Container maxWidth="xl">
-          <Typography 
-            variant="h4" 
+          <Typography
+            variant="h4"
             gutterBottom
-            sx={{ 
-              color: '#1A1F36',
+            sx={{
+              color: "#1A1F36",
               fontWeight: 800,
               mb: 4,
-              fontSize: { xs: '1.75rem', sm: '2rem' },
-              letterSpacing: '-0.02em',
-              fontFamily: "'Poppins', 'Inter', sans-serif"
+              fontSize: { xs: "1.75rem", sm: "2rem" },
+              letterSpacing: "-0.02em",
+              fontFamily: "'Poppins', 'Inter', sans-serif",
             }}
           >
             Admin Management
           </Typography>
 
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 2, height: "100%" }}>
-              <Typography variant="h6" gutterBottom>
-                OD Requests by Year
-              </Typography>
-              <Box sx={{ height: 300, position: "relative" }}>
-                {odStudentYears.length > 0 ? (
-                  <Pie data={chartData} options={chartOptions} />
-                ) : (
-                  <Alert severity="info">No OD request data available</Alert>
-                )}
-              </Box>
-              {/* Statistics summary below the pie chart */}
-              <Box sx={{ mt: 2 }}>
-                {odStudentYears.map((year, idx) => (
-                  <Typography key={year} variant="body1" gutterBottom>
-                    {`Year ${year}`}: {odStudentYearCounts[idx]}
-                  </Typography>
-                ))}
-              </Box>
-            </Paper>
-          </Grid>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Paper sx={{ p: 2, height: "100%" }}>
+                <Typography variant="h6" gutterBottom>
+                  OD Requests by Year
+                </Typography>
+                <Box sx={{ height: 300, position: "relative" }}>
+                  {odStudentYears.length > 0 ? (
+                    <Pie data={chartData} options={chartOptions} />
+                  ) : (
+                    <Alert severity="info">No OD request data available</Alert>
+                  )}
+                </Box>
+                {/* Statistics summary below the pie chart */}
+                <Box sx={{ mt: 2 }}>
+                  {odStudentYears.map((year, idx) => (
+                    <Typography key={year} variant="body1" gutterBottom>
+                      {`Year ${year}`}: {odStudentYearCounts[idx]}
+                    </Typography>
+                  ))}
+                </Box>
+              </Paper>
+            </Grid>
 
-          <Grid item xs={12} md={6}>
-            <Paper sx={{ p: 2, height: "100%" }}>
-              <Typography variant="h6" gutterBottom>
-                OD Requests by Status
-              </Typography>
-              <Box sx={{ height: 300, position: "relative" }}>
-                {statusLabels.length > 0 ? (
-                  <Pie data={statusChartData} options={statusChartOptions} />
-                ) : (
-                  <Alert severity="info">
-                    No OD request status data available
-                  </Alert>
-                )}
-              </Box>
-              {/* Statistics summary below the pie chart */}
-              <Box sx={{ mt: 2 }}>
-                {statusLabels.length > 0
-                  ? statusLabels.map((label, idx) => (
+            <Grid item xs={12} md={6}>
+              <Paper sx={{ p: 2, height: "100%" }}>
+                <Typography variant="h6" gutterBottom>
+                  OD Requests by Status
+                </Typography>
+                <Box sx={{ height: 300, position: "relative" }}>
+                  {statusLabels.length > 0 ? (
+                    <Pie data={statusChartData} options={statusChartOptions} />
+                  ) : (
+                    <Alert severity="info">
+                      No OD request status data available
+                    </Alert>
+                  )}
+                </Box>
+                {/* Statistics summary below the pie chart */}
+                <Box sx={{ mt: 2 }}>
+                  {statusLabels.length > 0 ? (
+                    statusLabels.map((label, idx) => (
                       <Typography key={label} variant="body1" gutterBottom>
                         {label}: {statusCounts[label]}
                       </Typography>
                     ))
-                  : <Alert severity="info">No statistics available</Alert>
-                }
-              </Box>
-            </Paper>
+                  ) : (
+                    <Alert severity="info">No statistics available</Alert>
+                  )}
+                </Box>
+              </Paper>
+            </Grid>
           </Grid>
-        </Grid>
 
-        {/* Sender Email Section */}
-        <Paper sx={{ p: 2, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Sender Email Settings
-          </Typography>
-          <Box display="flex" alignItems="center" gap={2}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleOpenSenderDialog}
-            >
-              Change Sender Email
-            </Button>
-          </Box>
-          {senderEmailError && (
-            <Alert severity="error" sx={{ mt: 2 }}>
-              {senderEmailError}
-            </Alert>
-          )}
-        </Paper>
-
-        {/* Sender Email Change Dialog */}
-        <Dialog open={openSenderDialog} onClose={handleCloseSenderDialog}>
-          <DialogTitle>Change Sender Email</DialogTitle>
-          <DialogContent>
-            <TextField
-              label="Sender Email"
-              value={senderEmail}
-              onChange={(e) => setSenderEmail(e.target.value)}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Sender Email's App Password"
-              type="password"
-              value={senderEmailPassword}
-              onChange={(e) => setSenderEmailPassword(e.target.value)}
-              fullWidth
-              margin="normal"
-            />
+          {/* Sender Email Section */}
+          <Paper sx={{ p: 2, mb: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Sender Email Settings
+            </Typography>
+            <Box display="flex" alignItems="center" gap={2}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleOpenSenderDialog}
+              >
+                Change Sender Email
+              </Button>
+            </Box>
             {senderEmailError && (
               <Alert severity="error" sx={{ mt: 2 }}>
                 {senderEmailError}
               </Alert>
             )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseSenderDialog}>Cancel</Button>
-            <Button
-              onClick={handleSenderDialogSubmit}
-              variant="contained"
-              color="primary"
-              disabled={
-                senderEmailLoading || !senderEmail || !senderEmailPassword
-              }
-            >
-              {senderEmailLoading ? "Saving..." : "Submit"}
-            </Button>
-          </DialogActions>
-        </Dialog>
+          </Paper>
 
-        <Box sx={{ mb: 3, p: 2, border: "1px solid #eee", borderRadius: 2 }}>
-          <Typography variant="h6">Auto-Forward Faculty Timeout</Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 1 }}>
-            <TextField
-              label="Timeout (minutes)"
-              type="number"
-              value={autoForwardTimeoutInput}
-              onChange={(e) => setAutoForwardTimeoutInput(e.target.value)}
-              size="small"
-              inputProps={{ min: 1 }}
-              disabled={autoForwardTimeoutLoading}
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleUpdateTimeout}
-              disabled={
-                autoForwardTimeoutLoading || Number(autoForwardTimeoutInput) < 1
-              }
-            >
-              Update
-            </Button>
-            <Typography variant="body2" color="text.secondary">
-              Current: {autoForwardTimeout} min
-            </Typography>
-          </Box>
-          {autoForwardTimeoutMsg && (
-            <Alert
-              severity={
-                autoForwardTimeoutMsg.includes("success") ? "success" : "error"
-              }
-              sx={{ mt: 1 }}
-            >
-              {autoForwardTimeoutMsg}
-            </Alert>
-          )}
-        </Box>
-        <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => navigate("/register")}
-          >
-            Register User
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<UploadFileIcon />}
-            onClick={handleOpenExcelUpload}
-          >
-            Student Bulk Register (Excel)
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={async () => {
-              try {
-                const response = await axios.get(
-                  `${API_BASE_URL}/assets/sample_students.xlsx`,
-                  { responseType: "blob" }
-                );
-                const url = window.URL.createObjectURL(response.data);
-                const link = document.createElement("a");
-                link.href = url;
-                link.setAttribute("download", "sample_students.xlsx");
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                window.URL.revokeObjectURL(url);
-              } catch (error) {
-                console.error("Error downloading sample file:", error);
-                showErrorDialog(
-                  "Download Failed",
-                  "Failed to download sample Excel file. Make sure the file exists at /assets/sample_students.xlsx"
-                );
-              }
-            }}
-            title="Download sample Excel template for bulk student registration"
-            sx={{ color: "#ffffff" }}
-          >
-            📥 Download Sample Excel
-          </Button>
-        </Box>
+          {/* Sender Email Change Dialog */}
+          <Dialog open={openSenderDialog} onClose={handleCloseSenderDialog}>
+            <DialogTitle>Change Sender Email</DialogTitle>
+            <DialogContent>
+              <TextField
+                label="Sender Email"
+                value={senderEmail}
+                onChange={(e) => setSenderEmail(e.target.value)}
+                fullWidth
+                margin="normal"
+              />
+              <TextField
+                label="Sender Email's App Password"
+                type="password"
+                value={senderEmailPassword}
+                onChange={(e) => setSenderEmailPassword(e.target.value)}
+                fullWidth
+                margin="normal"
+              />
+              {senderEmailError && (
+                <Alert severity="error" sx={{ mt: 2 }}>
+                  {senderEmailError}
+                </Alert>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseSenderDialog}>Cancel</Button>
+              <Button
+                onClick={handleSenderDialogSubmit}
+                variant="contained"
+                color="primary"
+                disabled={
+                  senderEmailLoading || !senderEmail || !senderEmailPassword
+                }
+              >
+                {senderEmailLoading ? "Saving..." : "Submit"}
+              </Button>
+            </DialogActions>
+          </Dialog>
 
-        <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>
-          All OD Requests
-        </Typography>
-
-        <Button
-          variant="contained"
-          onClick={() => setShowAllOdRequests((prev) => !prev)}
-          sx={{ mb: 2 }}
-        >
-          {showAllOdRequests ? "Hide All OD Requests" : "Show All OD Requests"}
-        </Button>
-        {showAllOdRequests && (
-          <>
-            <Box display="flex" justifyContent="flex-end" mb={2}>
+          <Box sx={{ mb: 3, p: 2, border: "1px solid #eee", borderRadius: 2 }}>
+            <Typography variant="h6">Auto-Forward Faculty Timeout</Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 1 }}>
+              <TextField
+                label="Timeout (minutes)"
+                type="number"
+                value={autoForwardTimeoutInput}
+                onChange={(e) => setAutoForwardTimeoutInput(e.target.value)}
+                size="small"
+                inputProps={{ min: 1 }}
+                disabled={autoForwardTimeoutLoading}
+              />
               <Button
                 variant="contained"
-                color="success"
-                onClick={handleOpenExcelDialog}
-                sx={{ ml: 2 }}
+                color="primary"
+                onClick={handleUpdateTimeout}
+                disabled={
+                  autoForwardTimeoutLoading ||
+                  Number(autoForwardTimeoutInput) < 1
+                }
               >
-                Download Excel
+                Update
               </Button>
+              <Typography variant="body2" color="text.secondary">
+                Current: {autoForwardTimeout} min
+              </Typography>
             </Box>
-
-            {error && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {error}
+            {autoForwardTimeoutMsg && (
+              <Alert
+                severity={
+                  autoForwardTimeoutMsg.includes("success")
+                    ? "success"
+                    : "error"
+                }
+                sx={{ mt: 1 }}
+              >
+                {autoForwardTimeoutMsg}
               </Alert>
             )}
-
-            <Grid container spacing={2} sx={{ mb: 3, alignItems: "end" }}>
-              <Grid item xs={12} md={2}>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  label="Student Name"
-                  value={filterStudent}
-                  onChange={(e) => setFilterStudent(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12} md={2}>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  label="Register Number"
-                  value={filterRegno}
-                  onChange={(e) => setFilterRegno(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12} md={2}>
-                <TextField
-                  select
-                  fullWidth
-                  variant="outlined"
-                  label="Year Level"
-                  value={filterYearLevel}
-                  onChange={(e) => setFilterYearLevel(e.target.value)}
-                >
-                  <MenuItem value="">All Years</MenuItem>
-                  <MenuItem value="1">1st Year</MenuItem>
-                  <MenuItem value="2">2nd Year</MenuItem>
-                  <MenuItem value="3">3rd Year</MenuItem>
-                  <MenuItem value="4">4th Year</MenuItem>
-                </TextField>
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <Grid container spacing={1}>
-                    <Grid item xs={6}>
-                      <DatePicker
-                        label="Academic Year Start"
-                        value={academicYearRange[0]}
-                        onChange={(newValue) =>
-                          setAcademicYearRange([newValue, academicYearRange[1]])
-                        }
-                        slotProps={{
-                          textField: { fullWidth: true, size: "small" },
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <DatePicker
-                        label="Academic Year End"
-                        value={academicYearRange[1]}
-                        onChange={(newValue) =>
-                          setAcademicYearRange([academicYearRange[0], newValue])
-                        }
-                        slotProps={{
-                          textField: { fullWidth: true, size: "small" },
-                        }}
-                      />
-                    </Grid>
-                  </Grid>
-                </LocalizationProvider>
-              </Grid>
-              <Grid item xs={12} md={2}>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  label="Event"
-                  value={filterEvent}
-                  onChange={(e) => setFilterEvent(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={12} md={2}>
-                <TextField
-                  select
-                  fullWidth
-                  variant="outlined"
-                  label="Event Type"
-                  value={filterEventType}
-                  onChange={(e) => setFilterEventType(e.target.value)}
-                >
-                  <MenuItem value="">All Event Types</MenuItem>
-                  {eventTypes.map((et) => (
-                    <MenuItem key={et} value={et}>
-                      {et.charAt(0).toUpperCase() + et.slice(1)}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-              <Grid item xs={12} md={2}>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  color="secondary"
-                  onClick={handleClearFilters}
-                >
-                  Clear Filters
-                </Button>
-              </Grid>
-            </Grid>
-
-            {filteredRequests.length === 0 ? (
-              <Alert severity="info">No OD requests found.</Alert>
-            ) : (
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Student Name</TableCell>
-                      <TableCell>Roll Number</TableCell>
-                      <TableCell>Year</TableCell>
-                      <TableCell>Event Name</TableCell>
-                      <TableCell>Event Type</TableCell>
-                      <TableCell>Date</TableCell>
-                      <TableCell>Reason</TableCell>
-                      <TableCell>Faculty Advisor</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Proof Status</TableCell>
-                      <TableCell>Time Elapsed</TableCell>
-                      <TableCell>Brochure</TableCell>
-                      <TableCell>Actions</TableCell>
-        
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {filteredRequests.map((request) => (
-                      <TableRow key={request._id}>
-                        <TableCell>{request.student?.name || "N/A"}</TableCell>
-                        <TableCell>{request.student?.registerNo || "N/A"}</TableCell>
-                        <TableCell>{request.student?.currentYear || "N/A"}</TableCell>
-                        <TableCell>{request.eventName || "N/A"}</TableCell>
-                        <TableCell>{request.eventType || "N/A"}</TableCell>
-                        <TableCell>{request.eventDate ? new Date(request.eventDate).toLocaleDateString() : "N/A"}</TableCell>
-                        <TableCell>
-                          <Tooltip title={request.reason || "No reason provided"}>
-                            <Typography noWrap style={{ maxWidth: 200 }}>{request.reason || "N/A"}</Typography>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell>{request.classAdvisor?.name || "N/A"}</TableCell>
-                        <TableCell>
-                          <Chip label={request.status?.replace(/_/g, " ") || "N/A"} color={getStatusColor(request.status)} />
-                        </TableCell>
-                        <TableCell>
-                          {!request.proofSubmitted ? (
-                            <Chip label="NOT SUBMITTED" size="small" />
-                          ) : request.proofRejected ? (
-                            <Chip label="REJECTED" color="error" size="small" />
-                          ) : request.proofVerified ? (
-                            <Chip label="VERIFIED" color="success" size="small" />
-                          ) : (
-                            <Chip label="PENDING" color="warning" size="small" />
-                          )}
-                        </TableCell>
-                        <TableCell>{getTimeElapsed(request.lastStatusChangeAt || request.createdAt)}</TableCell>
-                        <TableCell>
-                          {request.brochure && (
-                            <Button variant="outlined" size="small" onClick={() => window.open(`http://localhost:5001/${request.brochure}`, "_blank")}>View Brochure</Button>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {request.proofSubmitted && !request.proofVerified && !request.proofRejected && (
-                            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", flexDirection: "column" }}>
-                              <Button variant="outlined" size="small" onClick={() => handleViewProof(request)}>View Proof</Button>
-                              <Box sx={{ display: "flex", gap: 1 }}>
-                                <Button variant="contained" color="success" size="small" onClick={() => handleVerifyProof(request._id)}>Approve Proof</Button>
-                                <Button variant="contained" color="error" size="small" onClick={() => handleRejectProof(request._id)}>Reject Proof</Button>
-                              </Box>
-                            </Box>
-                          )}
-                          {request.status === "forwarded_to_admin" && !request.proofSubmitted && (
-                            <Button variant="contained" color="primary" size="small" onClick={() => handleForwardToHod(request._id)}>
-                              Forward to HOD
-                            </Button>
-                          )}
-                          {request.status === "forwarded_to_admin" && request.proofSubmitted && (
-                            <Typography variant="caption" display="block" sx={{ color: "orange" }}>
-                              Awaiting proof verification
-                            </Typography>
-                          )}
-                          {request.proofVerified && (
-                            <Chip label="✓ Proof Verified" color="success" size="small" />
-                          )}
-                          {request.proofRejected && (
-                            <Chip label="✗ Proof Rejected" color="error" size="small" />
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </>
-        )}
-
-        {/* Event Type Requests Section */}
-        <Box p={3}>
-          <Button
-            variant="contained"
-            onClick={() => setShowEventTypeRequests((prev) => !prev)}
-          >
-            {showEventTypeRequests
-              ? "Hide Event Type Requests"
-              : "Show Event Type Requests"}
-          </Button>
-        </Box>
-        {showEventTypeRequests && (
-          <Paper sx={{ p: 2, mb: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Event Type Requests
-            </Typography>
-            {eventTypeMsg && (
-              <Alert severity="info" sx={{ mb: 2 }}>
-                {eventTypeMsg}
-              </Alert>
-            )}
-            {eventTypeRequests.length === 0 ? (
-              <Alert severity="success">No pending event type requests.</Alert>
-            ) : (
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Requested Event Type</TableCell>
-                      <TableCell>Date</TableCell>
-                      <TableCell>Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {eventTypeRequests.map((req, idx) => (
-                      <TableRow key={idx}>
-                        <TableCell>
-                          <Box sx={{ display: "flex", alignItems: "center" }}>
-                            {req.eventType}
-                            <IconButton
-                              size="small"
-                              sx={{ ml: 1 }}
-                              onClick={() => handleOpenEditDialog(idx)}
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                          </Box>
-                        </TableCell>
-                        <TableCell>
-                          {req.date ? new Date(req.date).toLocaleString() : "-"}
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            size="small"
-                            sx={{ mr: 1 }}
-                            onClick={() =>
-                              handleAcceptEventType(req.eventType, idx)
-                            }
-                          >
-                            Accept
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            color="error"
-                            size="small"
-                            onClick={() => handleRejectEventType(idx)}
-                          >
-                            Reject
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </Paper>
-        )}
-
-        {/* Event Types Section */}
-        <Box p={3}>
-          <Box sx={{ mb: 2 }}>
+          </Box>
+          <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
             <Button
               variant="contained"
-              onClick={() => setShowEventTypes((prev) => !prev)}
+              color="secondary"
+              onClick={() => navigate("/register")}
             >
-              {showEventTypes ? "Hide Event Types" : "Show Event Types"}
+              Register User
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<UploadFileIcon />}
+              onClick={handleOpenExcelUpload}
+            >
+              Student Bulk Register (Excel)
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={async () => {
+                try {
+                  const response = await axios.get(
+                    `${API_BASE_URL}/assets/sample_students.xlsx`,
+                    { responseType: "blob" }
+                  );
+                  const url = window.URL.createObjectURL(response.data);
+                  const link = document.createElement("a");
+                  link.href = url;
+                  link.setAttribute("download", "sample_students.xlsx");
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  window.URL.revokeObjectURL(url);
+                } catch (error) {
+                  console.error("Error downloading sample file:", error);
+                  showErrorDialog(
+                    "Download Failed",
+                    "Failed to download sample Excel file. Make sure the file exists at /assets/sample_students.xlsx"
+                  );
+                }
+              }}
+              title="Download sample Excel template for bulk student registration"
+              sx={{ color: "#ffffff" }}
+            >
+              📥 Download Sample Excel
             </Button>
           </Box>
-          {showEventTypes && (
+
+          <Typography variant="h5" sx={{ mt: 4, mb: 2 }}>
+            All OD Requests
+          </Typography>
+
+          <Button
+            variant="contained"
+            onClick={() => setShowAllOdRequests((prev) => !prev)}
+            sx={{ mb: 2 }}
+          >
+            {showAllOdRequests
+              ? "Hide All OD Requests"
+              : "Show All OD Requests"}
+          </Button>
+          {showAllOdRequests && (
+            <>
+              <Box display="flex" justifyContent="flex-end" mb={2}>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={handleOpenExcelDialog}
+                  sx={{ ml: 2 }}
+                >
+                  Download Excel
+                </Button>
+              </Box>
+
+              {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              )}
+
+              <Grid container spacing={2} sx={{ mb: 3, alignItems: "end" }}>
+                <Grid item xs={12} md={2}>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    label="Student Name"
+                    value={filterStudent}
+                    onChange={(e) => setFilterStudent(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} md={2}>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    label="Register Number"
+                    value={filterRegno}
+                    onChange={(e) => setFilterRegno(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} md={2}>
+                  <TextField
+                    select
+                    fullWidth
+                    variant="outlined"
+                    label="Year Level"
+                    value={filterYearLevel}
+                    onChange={(e) => setFilterYearLevel(e.target.value)}
+                  >
+                    <MenuItem value="">All Years</MenuItem>
+                    <MenuItem value="1">1st Year</MenuItem>
+                    <MenuItem value="2">2nd Year</MenuItem>
+                    <MenuItem value="3">3rd Year</MenuItem>
+                    <MenuItem value="4">4th Year</MenuItem>
+                  </TextField>
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <Grid container spacing={1}>
+                      <Grid item xs={6}>
+                        <DatePicker
+                          label="Academic Year Start"
+                          value={academicYearRange[0]}
+                          onChange={(newValue) =>
+                            setAcademicYearRange([
+                              newValue,
+                              academicYearRange[1],
+                            ])
+                          }
+                          slotProps={{
+                            textField: { fullWidth: true, size: "small" },
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={6}>
+                        <DatePicker
+                          label="Academic Year End"
+                          value={academicYearRange[1]}
+                          onChange={(newValue) =>
+                            setAcademicYearRange([
+                              academicYearRange[0],
+                              newValue,
+                            ])
+                          }
+                          slotProps={{
+                            textField: { fullWidth: true, size: "small" },
+                          }}
+                        />
+                      </Grid>
+                    </Grid>
+                  </LocalizationProvider>
+                </Grid>
+                <Grid item xs={12} md={2}>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    label="Event"
+                    value={filterEvent}
+                    onChange={(e) => setFilterEvent(e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} md={2}>
+                  <TextField
+                    select
+                    fullWidth
+                    variant="outlined"
+                    label="Event Type"
+                    value={filterEventType}
+                    onChange={(e) => setFilterEventType(e.target.value)}
+                  >
+                    <MenuItem value="">All Event Types</MenuItem>
+                    {eventTypes.map((et) => (
+                      <MenuItem key={et} value={et}>
+                        {et.charAt(0).toUpperCase() + et.slice(1)}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid item xs={12} md={2}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    color="secondary"
+                    onClick={handleClearFilters}
+                  >
+                    Clear Filters
+                  </Button>
+                </Grid>
+              </Grid>
+
+              {filteredRequests.length === 0 ? (
+                <Alert severity="info">No OD requests found.</Alert>
+              ) : (
+                <Box
+                  sx={{
+                    width: "100%",
+                    overflowX: "auto",
+                    overflowY: "hidden",
+                    WebkitOverflowScrolling: "touch",
+                    border: "1px solid #E5E7EB",
+                    borderRadius: "12px",
+                    background: "#FFFFFF",
+                  }}
+                >
+                  <Table sx={{ minWidth: 1400, width: "auto" }}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Student Name</TableCell>
+                        <TableCell>Roll Number</TableCell>
+                        <TableCell>Year</TableCell>
+                        <TableCell>Event Name</TableCell>
+                        <TableCell>Event Type</TableCell>
+                        <TableCell>Date</TableCell>
+                        <TableCell>Reason</TableCell>
+                        <TableCell>Faculty Advisor</TableCell>
+                        <TableCell>Status</TableCell>
+                        <TableCell>Proof Status</TableCell>
+                        <TableCell>Time Elapsed</TableCell>
+                        <TableCell>Brochure</TableCell>
+                        <TableCell>Actions</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {filteredRequests.map((request) => (
+                        <TableRow key={request._id}>
+                          <TableCell>
+                            {request.student?.name || "N/A"}
+                          </TableCell>
+                          <TableCell>
+                            {request.student?.registerNo || "N/A"}
+                          </TableCell>
+                          <TableCell>
+                            {request.student?.currentYear || "N/A"}
+                          </TableCell>
+                          <TableCell>{request.eventName || "N/A"}</TableCell>
+                          <TableCell>{request.eventType || "N/A"}</TableCell>
+                          <TableCell>
+                            {request.eventDate
+                              ? new Date(request.eventDate).toLocaleDateString()
+                              : "N/A"}
+                          </TableCell>
+                          <TableCell>
+                            <Tooltip
+                              title={request.reason || "No reason provided"}
+                            >
+                              <Typography noWrap style={{ maxWidth: 200 }}>
+                                {request.reason || "N/A"}
+                              </Typography>
+                            </Tooltip>
+                          </TableCell>
+                          <TableCell>
+                            {request.classAdvisor?.name || "N/A"}
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              label={
+                                request.status?.replace(/_/g, " ") || "N/A"
+                              }
+                              color={getStatusColor(request.status)}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            {!request.proofSubmitted ? (
+                              <Chip label="NOT SUBMITTED" size="small" />
+                            ) : request.proofRejected ? (
+                              <Chip
+                                label="REJECTED"
+                                color="error"
+                                size="small"
+                              />
+                            ) : request.proofVerified ? (
+                              <Chip
+                                label="VERIFIED"
+                                color="success"
+                                size="small"
+                              />
+                            ) : (
+                              <Chip
+                                label="PENDING"
+                                color="warning"
+                                size="small"
+                              />
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {getTimeElapsed(
+                              request.lastStatusChangeAt || request.createdAt
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {request.brochure && (
+                              <Button
+                                variant="outlined"
+                                size="small"
+                                onClick={() =>
+                                  window.open(
+                                    `http://localhost:5001/${request.brochure}`,
+                                    "_blank"
+                                  )
+                                }
+                              >
+                                View Brochure
+                              </Button>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {request.proofSubmitted &&
+                              !request.proofVerified &&
+                              !request.proofRejected && (
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    gap: 1,
+                                    flexWrap: "wrap",
+                                    flexDirection: "column",
+                                  }}
+                                >
+                                  <Button
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={() => handleViewProof(request)}
+                                  >
+                                    View Proof
+                                  </Button>
+                                  <Box sx={{ display: "flex", gap: 1 }}>
+                                    <Button
+                                      variant="contained"
+                                      color="success"
+                                      size="small"
+                                      onClick={() =>
+                                        handleVerifyProof(request._id)
+                                      }
+                                    >
+                                      Approve Proof
+                                    </Button>
+                                    <Button
+                                      variant="contained"
+                                      color="error"
+                                      size="small"
+                                      onClick={() =>
+                                        handleRejectProof(request._id)
+                                      }
+                                    >
+                                      Reject Proof
+                                    </Button>
+                                  </Box>
+                                </Box>
+                              )}
+                            {request.status === "forwarded_to_admin" &&
+                              !request.proofSubmitted && (
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  size="small"
+                                  onClick={() =>
+                                    handleForwardToHod(request._id)
+                                  }
+                                >
+                                  Forward to HOD
+                                </Button>
+                              )}
+                            {request.status === "forwarded_to_admin" &&
+                              request.proofSubmitted && (
+                                <Typography
+                                  variant="caption"
+                                  display="block"
+                                  sx={{ color: "orange" }}
+                                >
+                                  Awaiting proof verification
+                                </Typography>
+                              )}
+                            {request.proofVerified && (
+                              <Chip
+                                label="✓ Proof Verified"
+                                color="success"
+                                size="small"
+                              />
+                            )}
+                            {request.proofRejected && (
+                              <Chip
+                                label="✗ Proof Rejected"
+                                color="error"
+                                size="small"
+                              />
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Box>
+              )}
+            </>
+          )}
+
+          {/* Event Type Requests Section */}
+          <Box p={3}>
+            <Button
+              variant="contained"
+              onClick={() => setShowEventTypeRequests((prev) => !prev)}
+            >
+              {showEventTypeRequests
+                ? "Hide Event Type Requests"
+                : "Show Event Type Requests"}
+            </Button>
+          </Box>
+          {showEventTypeRequests && (
             <Paper sx={{ p: 2, mb: 3 }}>
               <Typography variant="h6" gutterBottom>
-                Event Types
+                Event Type Requests
               </Typography>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Event Type</TableCell>
-                      <TableCell>Actions</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {eventTypes.map((et, idx) => (
-                      <TableRow key={idx}>
-                        <TableCell>{et}</TableCell>
-                        <TableCell>
-                          <IconButton
-                            color="error"
-                            onClick={() => handleOpenDeleteDialog(et)}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </TableCell>
+              {eventTypeMsg && (
+                <Alert severity="info" sx={{ mb: 2 }}>
+                  {eventTypeMsg}
+                </Alert>
+              )}
+              {eventTypeRequests.length === 0 ? (
+                <Alert severity="success">
+                  No pending event type requests.
+                </Alert>
+              ) : (
+                <Box
+                  sx={{
+                    width: "100%",
+                    overflowX: "auto",
+                    overflowY: "hidden",
+                    WebkitOverflowScrolling: "touch",
+                    border: "1px solid #E5E7EB",
+                    borderRadius: "12px",
+                    background: "#FFFFFF",
+                  }}
+                >
+                  <Table sx={{ minWidth: 800, width: "auto" }}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Requested Event Type</TableCell>
+                        <TableCell>Date</TableCell>
+                        <TableCell>Actions</TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                      {eventTypeRequests.map((req, idx) => (
+                        <TableRow key={idx}>
+                          <TableCell>
+                            <Box sx={{ display: "flex", alignItems: "center" }}>
+                              {req.eventType}
+                              <IconButton
+                                size="small"
+                                sx={{ ml: 1 }}
+                                onClick={() => handleOpenEditDialog(idx)}
+                              >
+                                <EditIcon fontSize="small" />
+                              </IconButton>
+                            </Box>
+                          </TableCell>
+                          <TableCell>
+                            {req.date
+                              ? new Date(req.date).toLocaleString()
+                              : "-"}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              size="small"
+                              sx={{ mr: 1 }}
+                              onClick={() =>
+                                handleAcceptEventType(req.eventType, idx)
+                              }
+                            >
+                              Accept
+                            </Button>
+                            <Button
+                              variant="outlined"
+                              color="error"
+                              size="small"
+                              onClick={() => handleRejectEventType(idx)}
+                            >
+                              Reject
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Box>
+              )}
             </Paper>
           )}
-        </Box>
+
+          {/* Event Types Section */}
+          <Box p={3}>
+            <Box sx={{ mb: 2 }}>
+              <Button
+                variant="contained"
+                onClick={() => setShowEventTypes((prev) => !prev)}
+              >
+                {showEventTypes ? "Hide Event Types" : "Show Event Types"}
+              </Button>
+            </Box>
+            {showEventTypes && (
+              <Paper sx={{ p: 2, mb: 3 }}>
+                <Typography variant="h6" gutterBottom>
+                  Event Types
+                </Typography>
+                <Box
+                  sx={{
+                    width: "100%",
+                    overflowX: "auto",
+                    overflowY: "hidden",
+                    WebkitOverflowScrolling: "touch",
+                    border: "1px solid #E5E7EB",
+                    borderRadius: "12px",
+                  }}
+                >
+                  <Table sx={{ minWidth: 600, width: "auto" }}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Event Type</TableCell>
+                        <TableCell>Actions</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {eventTypes.map((et, idx) => (
+                        <TableRow key={idx}>
+                          <TableCell>{et}</TableCell>
+                          <TableCell>
+                            <IconButton
+                              color="error"
+                              onClick={() => handleOpenDeleteDialog(et)}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Box>
+              </Paper>
+            )}
+          </Box>
         </Container>
       </Box>
 
@@ -1743,8 +1902,12 @@ const AdminManagement = () => {
         <DialogContent sx={{ pt: 2 }}>
           {selectedProofRequest?.student && (
             <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: "bold", mb: 1 }}>
-                Student: {selectedProofRequest.student.name} ({selectedProofRequest.student.registerNo})
+              <Typography
+                variant="subtitle2"
+                sx={{ fontWeight: "bold", mb: 1 }}
+              >
+                Student: {selectedProofRequest.student.name} (
+                {selectedProofRequest.student.registerNo})
               </Typography>
               <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
                 Event: {selectedProofRequest.eventName}
@@ -1764,7 +1927,9 @@ const AdminManagement = () => {
                 p: 2,
               }}
             >
-              {selectedProofRequest.proofDocument.toLowerCase().endsWith(".pdf") ? (
+              {selectedProofRequest.proofDocument
+                .toLowerCase()
+                .endsWith(".pdf") ? (
                 <iframe
                   src={`http://localhost:5001/${selectedProofRequest.proofDocument}`}
                   style={{
@@ -1810,7 +1975,10 @@ const AdminManagement = () => {
           ⚠️ {errorDialogTitle}
         </DialogTitle>
         <DialogContent sx={{ pt: 2 }}>
-          <Typography variant="body1" sx={{ whiteSpace: "pre-wrap", lineHeight: 1.6 }}>
+          <Typography
+            variant="body1"
+            sx={{ whiteSpace: "pre-wrap", lineHeight: 1.6 }}
+          >
             {errorDialogMessage}
           </Typography>
         </DialogContent>
@@ -1826,6 +1994,6 @@ const AdminManagement = () => {
       </Dialog>
     </Box>
   );
-}
+};
 
 export default AdminManagement;

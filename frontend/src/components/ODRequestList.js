@@ -40,23 +40,23 @@ const ODRequestList = () => {
   const [selectedFaculty, setSelectedFaculty] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
-    useEffect(() => {
-      if (success) {
-        const timer = setTimeout(() => {
-          setSuccess("");
-        }, 3000);
-        return () => clearTimeout(timer);
-      }
-    }, [success]);
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        setSuccess("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
 
-    useEffect(() => {
-      if (error) {
-        const timer = setTimeout(() => {
-          setError("");
-        }, 5000);
-        return () => clearTimeout(timer);
-      }
-    }, [error]);
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError("");
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   useEffect(() => {
     fetchRequests();
@@ -169,8 +169,8 @@ const ODRequestList = () => {
 
   const handleDownloadPDF = async (requestId) => {
     try {
-        setActionLoading(true);
-        setError("");
+      setActionLoading(true);
+      setError("");
       const token = localStorage.getItem("token");
       if (!token) {
         setError("Authentication token not found. Please login again.");
@@ -257,7 +257,9 @@ const ODRequestList = () => {
         }
       );
 
-      setSuccess("Proof submitted successfully to class advisor and admin for approval");
+      setSuccess(
+        "Proof submitted successfully to class advisor and admin for approval"
+      );
       setRequests(
         requests.map((req) =>
           req._id === response.data._id ? response.data : req
@@ -319,341 +321,369 @@ const ODRequestList = () => {
         }}
         open={actionLoading}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+          }}
+        >
           <CircularProgress color="inherit" size={60} />
           <Typography variant="h5">Processing...</Typography>
         </Box>
       </Backdrop>
-      <Box display="flex" flexDirection="column" minHeight="100vh" sx={{ background: '#F8FAFC' }}>
-      <SharedNavbar title="My OD Requests" />
-      <Container maxWidth="lg" sx={{ flex: 1, py: 4, px: { xs: 2, sm: 3 } }}>
-        <Paper 
-          elevation={0} 
-          sx={{ 
-            p: { xs: 3, sm: 4 }, 
-            mt: 4,
-            borderRadius: '16px',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-            border: '1px solid #E5E7EB',
-            background: '#FFFFFF'
-          }}
-        >
-          <Typography 
-            variant="h4" 
-            gutterBottom
-            sx={{ 
-              color: '#1A1F36',
-              fontWeight: 800,
-              mb: 3,
-              fontSize: { xs: '1.75rem', sm: '2rem' },
-              letterSpacing: '-0.02em',
-              fontFamily: "'Poppins', 'Inter', sans-serif"
+      <Box
+        display="flex"
+        flexDirection="column"
+        minHeight="100vh"
+        sx={{ background: "#F8FAFC" }}
+      >
+        <SharedNavbar title="My OD Requests" />
+        <Container maxWidth="lg" sx={{ flex: 1, py: 4, px: { xs: 2, sm: 3 } }}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 3, sm: 4 },
+              mt: 4,
+              borderRadius: "16px",
+              boxShadow:
+                "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+              border: "1px solid #E5E7EB",
+              background: "#FFFFFF",
+              overflow: "hidden",
             }}
           >
-            My OD Requests
-          </Typography>
-
-        {error && (
-          <Alert 
-            severity="error" 
-            sx={{ 
-              mb: 3,
-              borderRadius: '12px',
-              fontFamily: "'Poppins', 'Inter', sans-serif"
-            }}
-          >
-            {error}
-          </Alert>
-        )}
-        {success && (
-          <Alert 
-            severity="success" 
-            sx={{ 
-              mb: 3,
-              borderRadius: '12px',
-              fontFamily: "'Poppins', 'Inter', sans-serif"
-            }}
-          >
-            {success}
-          </Alert>
-        )}
-
-        <TableContainer
-          sx={{
-            borderRadius: '12px',
-            border: '1px solid #E5E7EB',
-            overflow: 'hidden'
-          }}
-        >
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Event Name</TableCell>
-                <TableCell>Event Date</TableCell>
-                <TableCell>Start Date</TableCell>
-                <TableCell>End Date</TableCell>
-                <TableCell>Class Advisor</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Proof Verification Status</TableCell>
-                <TableCell>Brochure</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {requests.map((request) => (
-                <TableRow key={request._id}>
-                  <TableCell>{request.eventName}</TableCell>
-                  <TableCell>
-                    {new Date(request.eventDate).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    {new Date(request.startDate).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    {new Date(request.endDate).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>{request.classAdvisor.name}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={request.status}
-                      color={getStatusColor(request.status)}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    {getProofVerificationChip(
-                      request.proofSubmitted,
-                      request.proofVerified,
-                      request.proofRejected
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {request.brochure && (
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() =>
-                          window.open(
-                            `http://localhost:5001/${request.brochure}`,
-                            "_blank"
-                          )
-                        }
-                        sx={{ 
-                          ml: 1,
-                          color: '#0077B6',
-                          borderColor: '#0077B6',
-                          '&:hover': {
-                            borderColor: '#0077B6',
-                            background: 'rgba(0, 119, 182, 0.1)',
-                            color: '#0077B6'
-                          }
-                        }}
-                      >
-                        View Brochure
-                      </Button>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: "flex", gap: 1 }}>
-                      {request.status === "approved_by_hod" &&
-                        !request.proofSubmitted && (
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            size="small"
-                            onClick={() => {
-                              setSelectedRequest(request);
-                              setProofDialogOpen(true);
-                            }}
-                            sx={{
-                              background: 'linear-gradient(135deg, #0D3B66 0%, #0077B6 100%)',
-                              color: '#FFFFFF',
-                              '&:hover': {
-                                background: 'linear-gradient(135deg, #0a2d4d 0%, #006699 100%)',
-                                color: '#FFFFFF'
-                              }
-                            }}
-                          >
-                            Submit Proof
-                          </Button>
-                        )}
-                      {request.status === "approved_by_hod" && (
-                        <Button
-                          variant="contained"
-                          color="secondary"
-                          size="small"
-                          onClick={() => handleDownloadPDF(request._id)}
-                          startIcon={<DownloadIcon />}
-                          sx={{
-                            background: '#6B7280',
-                            color: '#FFFFFF',
-                            '&:hover': {
-                              background: '#4B5563',
-                              color: '#FFFFFF'
-                            }
-                          }}
-                        >
-                          Download PDF
-                        </Button>
-                      )}
-                      {request.proofDocument && (
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={() => handleViewProof(request.proofDocument)}
-                          sx={{
-                            color: '#0077B6',
-                            borderColor: '#0077B6',
-                            '&:hover': {
-                              borderColor: '#0077B6',
-                              background: 'rgba(0, 119, 182, 0.1)',
-                              color: '#0077B6'
-                            }
-                          }}
-                        >
-                          View Proof
-                        </Button>
-                      )}
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        <Dialog
-          open={proofDialogOpen}
-          onClose={handleCloseProofDialog}
-          maxWidth="sm"
-          fullWidth
-        >
-          <DialogTitle>Submit Proof Document for Verification</DialogTitle>
-          <DialogContent>
-            <Box sx={{ mt: 2 }}>
-              <Alert severity="info" sx={{ mb: 2 }}>
-                Your proof will be sent to both your class advisor and admin for approval. Once either approves, notifications will be sent to all selected staff.
-              </Alert>
-              <input
-                type="file"
-                accept=".pdf,application/pdf"
-                onChange={handleFileChange}
-                style={{ marginBottom: "1rem" }}
-              />
-              <Autocomplete
-                multiple
-                options={facultyList}
-                getOptionLabel={(option) => option.name}
-                value={selectedFaculty}
-                onChange={(event, newValue) => {
-                  setSelectedFaculty(newValue);
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Select Faculty to Notify"
-                    placeholder="Select faculty members"
-                    fullWidth
-                  />
-                )}
-              />
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button 
-              onClick={handleCloseProofDialog}
-              sx={{ color: '#1A1F36' }}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSubmitProof}
-              variant="contained"
-              color="primary"
+            <Typography
+              variant="h4"
+              gutterBottom
               sx={{
-                background: 'linear-gradient(135deg, #0D3B66 0%, #0077B6 100%)',
-                color: '#FFFFFF',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #0a2d4d 0%, #006699 100%)',
-                  color: '#FFFFFF'
-                }
+                color: "#1A1F36",
+                fontWeight: 800,
+                mb: 3,
+                fontSize: { xs: "1.75rem", sm: "2rem" },
+                letterSpacing: "-0.02em",
+                fontFamily: "'Poppins', 'Inter', sans-serif",
               }}
             >
-              Submit
-            </Button>
-          </DialogActions>
-        </Dialog>
+              My OD Requests
+            </Typography>
 
-        <Dialog
-          open={viewProofDialogOpen}
-          onClose={() => setViewProofDialogOpen(false)}
-          maxWidth="md"
-          fullWidth
-        >
-          <DialogTitle>View Proof Document</DialogTitle>
-          <DialogContent>
-            {selectedRequest?.proofDocument && (
-              <Box
+            {error && (
+              <Alert
+                severity="error"
                 sx={{
-                  width: "100%",
-                  height: "80vh",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  bgcolor: "#f5f5f5",
-                  borderRadius: 1,
-                  p: 2,
+                  mb: 3,
+                  borderRadius: "12px",
+                  fontFamily: "'Poppins', 'Inter', sans-serif",
                 }}
               >
-                {selectedRequest.proofDocument
-                  .toLowerCase()
-                  .endsWith(".pdf") ? (
-                  <iframe
-                    src={`http://localhost:5001/${selectedRequest.proofDocument}`}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      border: "none",
-                      borderRadius: "4px",
-                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                    }}
-                    title="Proof Document"
-                  />
-                ) : (
-                  <img
-                    src={`http://localhost:5001/${selectedRequest.proofDocument}`}
-                    alt="Proof Document"
-                    style={{
-                      maxWidth: "100%",
-                      maxHeight: "100%",
-                      objectFit: "contain",
-                      borderRadius: "4px",
-                      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                    }}
-                  />
-                )}
-              </Box>
+                {error}
+              </Alert>
             )}
-          </DialogContent>
-          <DialogActions>
-            <Button 
-              onClick={() => setViewProofDialogOpen(false)}
+            {success && (
+              <Alert
+                severity="success"
+                sx={{
+                  mb: 3,
+                  borderRadius: "12px",
+                  fontFamily: "'Poppins', 'Inter', sans-serif",
+                }}
+              >
+                {success}
+              </Alert>
+            )}
+
+            <Box
               sx={{
-                background: 'linear-gradient(135deg, #0D3B66 0%, #0077B6 100%)',
-                color: '#FFFFFF',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #0a2d4d 0%, #006699 100%)',
-                  color: '#FFFFFF'
-                }
+                width: "100%",
+                overflowX: "auto",
+                overflowY: "hidden",
+                WebkitOverflowScrolling: "touch",
+                border: "1px solid #E5E7EB",
+                borderRadius: "12px",
               }}
             >
-              Close
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Paper>
-      </Container>
-    </Box>
+              <Table sx={{ minWidth: 1200, width: "auto" }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Event Name</TableCell>
+                    <TableCell>Event Date</TableCell>
+                    <TableCell>Start Date</TableCell>
+                    <TableCell>End Date</TableCell>
+                    <TableCell>Class Advisor</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Proof Verification Status</TableCell>
+                    <TableCell>Brochure</TableCell>
+                    <TableCell>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {requests.map((request) => (
+                    <TableRow key={request._id}>
+                      <TableCell>{request.eventName}</TableCell>
+                      <TableCell>
+                        {new Date(request.eventDate).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(request.startDate).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(request.endDate).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>{request.classAdvisor.name}</TableCell>
+                      <TableCell>
+                        <Chip
+                          label={request.status}
+                          color={getStatusColor(request.status)}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {getProofVerificationChip(
+                          request.proofSubmitted,
+                          request.proofVerified,
+                          request.proofRejected
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {request.brochure && (
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() =>
+                              window.open(
+                                `http://localhost:5001/${request.brochure}`,
+                                "_blank"
+                              )
+                            }
+                            sx={{
+                              ml: 1,
+                              color: "#0077B6",
+                              borderColor: "#0077B6",
+                              "&:hover": {
+                                borderColor: "#0077B6",
+                                background: "rgba(0, 119, 182, 0.1)",
+                                color: "#0077B6",
+                              },
+                            }}
+                          >
+                            View Brochure
+                          </Button>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: "flex", gap: 1 }}>
+                          {request.status === "approved_by_hod" &&
+                            !request.proofSubmitted && (
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                size="small"
+                                onClick={() => {
+                                  setSelectedRequest(request);
+                                  setProofDialogOpen(true);
+                                }}
+                                sx={{
+                                  background:
+                                    "linear-gradient(135deg, #0D3B66 0%, #0077B6 100%)",
+                                  color: "#FFFFFF",
+                                  "&:hover": {
+                                    background:
+                                      "linear-gradient(135deg, #0a2d4d 0%, #006699 100%)",
+                                    color: "#FFFFFF",
+                                  },
+                                }}
+                              >
+                                Submit Proof
+                              </Button>
+                            )}
+                          {request.status === "approved_by_hod" && (
+                            <Button
+                              variant="contained"
+                              color="secondary"
+                              size="small"
+                              onClick={() => handleDownloadPDF(request._id)}
+                              startIcon={<DownloadIcon />}
+                              sx={{
+                                background: "#6B7280",
+                                color: "#FFFFFF",
+                                "&:hover": {
+                                  background: "#4B5563",
+                                  color: "#FFFFFF",
+                                },
+                              }}
+                            >
+                              Download PDF
+                            </Button>
+                          )}
+                          {request.proofDocument && (
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              onClick={() =>
+                                handleViewProof(request.proofDocument)
+                              }
+                              sx={{
+                                color: "#0077B6",
+                                borderColor: "#0077B6",
+                                "&:hover": {
+                                  borderColor: "#0077B6",
+                                  background: "rgba(0, 119, 182, 0.1)",
+                                  color: "#0077B6",
+                                },
+                              }}
+                            >
+                              View Proof
+                            </Button>
+                          )}
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
+
+            <Dialog
+              open={proofDialogOpen}
+              onClose={handleCloseProofDialog}
+              maxWidth="sm"
+              fullWidth
+            >
+              <DialogTitle>Submit Proof Document for Verification</DialogTitle>
+              <DialogContent>
+                <Box sx={{ mt: 2 }}>
+                  <Alert severity="info" sx={{ mb: 2 }}>
+                    Your proof will be sent to both your class advisor and admin
+                    for approval. Once either approves, notifications will be
+                    sent to all selected staff.
+                  </Alert>
+                  <input
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    onChange={handleFileChange}
+                    style={{ marginBottom: "1rem" }}
+                  />
+                  <Autocomplete
+                    multiple
+                    options={facultyList}
+                    getOptionLabel={(option) => option.name}
+                    value={selectedFaculty}
+                    onChange={(event, newValue) => {
+                      setSelectedFaculty(newValue);
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Select Faculty to Notify"
+                        placeholder="Select faculty members"
+                        fullWidth
+                      />
+                    )}
+                  />
+                </Box>
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  onClick={handleCloseProofDialog}
+                  sx={{ color: "#1A1F36" }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSubmitProof}
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    background:
+                      "linear-gradient(135deg, #0D3B66 0%, #0077B6 100%)",
+                    color: "#FFFFFF",
+                    "&:hover": {
+                      background:
+                        "linear-gradient(135deg, #0a2d4d 0%, #006699 100%)",
+                      color: "#FFFFFF",
+                    },
+                  }}
+                >
+                  Submit
+                </Button>
+              </DialogActions>
+            </Dialog>
+
+            <Dialog
+              open={viewProofDialogOpen}
+              onClose={() => setViewProofDialogOpen(false)}
+              maxWidth="md"
+              fullWidth
+            >
+              <DialogTitle>View Proof Document</DialogTitle>
+              <DialogContent>
+                {selectedRequest?.proofDocument && (
+                  <Box
+                    sx={{
+                      width: "100%",
+                      height: "80vh",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      bgcolor: "#f5f5f5",
+                      borderRadius: 1,
+                      p: 2,
+                    }}
+                  >
+                    {selectedRequest.proofDocument
+                      .toLowerCase()
+                      .endsWith(".pdf") ? (
+                      <iframe
+                        src={`http://localhost:5001/${selectedRequest.proofDocument}`}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          border: "none",
+                          borderRadius: "4px",
+                          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                        }}
+                        title="Proof Document"
+                      />
+                    ) : (
+                      <img
+                        src={`http://localhost:5001/${selectedRequest.proofDocument}`}
+                        alt="Proof Document"
+                        style={{
+                          maxWidth: "100%",
+                          maxHeight: "100%",
+                          objectFit: "contain",
+                          borderRadius: "4px",
+                          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                        }}
+                      />
+                    )}
+                  </Box>
+                )}
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  onClick={() => setViewProofDialogOpen(false)}
+                  sx={{
+                    background:
+                      "linear-gradient(135deg, #0D3B66 0%, #0077B6 100%)",
+                    color: "#FFFFFF",
+                    "&:hover": {
+                      background:
+                        "linear-gradient(135deg, #0a2d4d 0%, #006699 100%)",
+                      color: "#FFFFFF",
+                    },
+                  }}
+                >
+                  Close
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </Paper>
+        </Container>
+      </Box>
     </>
   );
 };

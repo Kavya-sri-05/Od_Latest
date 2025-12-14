@@ -110,7 +110,8 @@ const FacultyODRequestList = () => {
         return;
       }
 
-      const endpoint = action === "approve" ? "advisor-approve" : "advisor-reject";
+      const endpoint =
+        action === "approve" ? "advisor-approve" : "advisor-reject";
       const res = await axios.put(
         `http://localhost:5001/api/od-requests/${selectedRequest}/${endpoint}`,
         { comment, approverName },
@@ -176,7 +177,10 @@ const FacultyODRequestList = () => {
       setActionLoading(false);
       let msg = "";
       if (err.response) {
-        msg = err.response.data.message || err.response.data.msg || "Error verifying proof.";
+        msg =
+          err.response.data.message ||
+          err.response.data.msg ||
+          "Error verifying proof.";
       } else if (err.request) {
         msg = "No response from server. Please check your connection.";
       } else {
@@ -206,7 +210,12 @@ const FacultyODRequestList = () => {
   };
 
   return (
-    <Box display="flex" flexDirection="column" minHeight="100vh" sx={{ background: '#F8FAFC' }}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      minHeight="100vh"
+      sx={{ background: "#F8FAFC" }}
+    >
       {/* Full-screen Processing Backdrop for all actions */}
       <Backdrop
         sx={{
@@ -217,11 +226,22 @@ const FacultyODRequestList = () => {
         }}
         open={actionLoading}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+          }}
+        >
           <CircularProgress color="inherit" size={60} />
-          <Typography 
+          <Typography
             variant="h5"
-            sx={{ fontFamily: "'Poppins', 'Inter', sans-serif", fontWeight: 600 }}
+            sx={{
+              fontFamily: "'Poppins', 'Inter', sans-serif",
+              fontWeight: 600,
+            }}
           >
             Processing...
           </Typography>
@@ -229,65 +249,70 @@ const FacultyODRequestList = () => {
       </Backdrop>
       <SharedNavbar title="Faculty Dashboard" />
       <Container maxWidth="lg" sx={{ flex: 1, py: 4, px: { xs: 2, sm: 3 } }}>
-        <Paper 
-          elevation={0} 
-          sx={{ 
-            p: { xs: 3, sm: 4 }, 
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 3, sm: 4 },
             mt: 4,
-            borderRadius: '16px',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-            border: '1px solid #E5E7EB',
-            background: '#FFFFFF'
+            borderRadius: "16px",
+            boxShadow:
+              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+            border: "1px solid #E5E7EB",
+            background: "#FFFFFF",
+            overflow: "hidden",
           }}
         >
-          <Typography 
-            variant="h4" 
+          <Typography
+            variant="h4"
             gutterBottom
-            sx={{ 
-              color: '#1A1F36',
+            sx={{
+              color: "#1A1F36",
               fontWeight: 800,
               mb: 3,
-              fontSize: { xs: '1.75rem', sm: '2rem' },
-              letterSpacing: '-0.02em',
-              fontFamily: "'Poppins', 'Inter', sans-serif"
+              fontSize: { xs: "1.75rem", sm: "2rem" },
+              letterSpacing: "-0.02em",
+              fontFamily: "'Poppins', 'Inter', sans-serif",
             }}
           >
             Faculty Dashboard
           </Typography>
 
           {error && (
-            <Alert 
-              severity="error" 
-              sx={{ 
+            <Alert
+              severity="error"
+              sx={{
                 mb: 3,
-                borderRadius: '12px',
-                fontFamily: "'Poppins', 'Inter', sans-serif"
+                borderRadius: "12px",
+                fontFamily: "'Poppins', 'Inter', sans-serif",
               }}
             >
               {error}
             </Alert>
           )}
           {success && (
-            <Alert 
-              severity="success" 
-              sx={{ 
+            <Alert
+              severity="success"
+              sx={{
                 mb: 3,
-                borderRadius: '12px',
-                fontFamily: "'Poppins', 'Inter', sans-serif"
+                borderRadius: "12px",
+                fontFamily: "'Poppins', 'Inter', sans-serif",
               }}
             >
               {success}
             </Alert>
           )}
 
-          <TableContainer
+          <Box
             sx={{
-              borderRadius: '12px',
-              border: '1px solid #E5E7EB',
-              overflow: 'hidden'
+              width: "100%",
+              overflowX: "auto",
+              overflowY: "hidden",
+              WebkitOverflowScrolling: "touch",
+              border: "1px solid #E5E7EB",
+              borderRadius: "12px",
             }}
           >
-            <Table>
+            <Table sx={{ minWidth: 1200, width: "auto" }}>
               <TableHead>
                 <TableRow>
                   <TableCell>Student Name</TableCell>
@@ -361,15 +386,15 @@ const FacultyODRequestList = () => {
                               "_blank"
                             )
                           }
-                          sx={{ 
+                          sx={{
                             ml: 1,
-                            color: '#0077B6',
-                            borderColor: '#0077B6',
-                            '&:hover': {
-                              borderColor: '#0077B6',
-                              background: 'rgba(0, 119, 182, 0.1)',
-                              color: '#0077B6'
-                            }
+                            color: "#0077B6",
+                            borderColor: "#0077B6",
+                            "&:hover": {
+                              borderColor: "#0077B6",
+                              background: "rgba(0, 119, 182, 0.1)",
+                              color: "#0077B6",
+                            },
                           }}
                         >
                           View Brochure
@@ -385,12 +410,14 @@ const FacultyODRequestList = () => {
                             size="small"
                             onClick={() => handleApprove(request._id)}
                             sx={{
-                              background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-                              color: '#FFFFFF',
-                              '&:hover': {
-                                background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                                color: '#FFFFFF'
-                              }
+                              background:
+                                "linear-gradient(135deg, #10B981 0%, #059669 100%)",
+                              color: "#FFFFFF",
+                              "&:hover": {
+                                background:
+                                  "linear-gradient(135deg, #059669 0%, #047857 100%)",
+                                color: "#FFFFFF",
+                              },
                             }}
                           >
                             Approve
@@ -401,12 +428,14 @@ const FacultyODRequestList = () => {
                             size="small"
                             onClick={() => handleReject(request._id)}
                             sx={{
-                              background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-                              color: '#FFFFFF',
-                              '&:hover': {
-                                background: 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)',
-                                color: '#FFFFFF'
-                              }
+                              background:
+                                "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
+                              color: "#FFFFFF",
+                              "&:hover": {
+                                background:
+                                  "linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)",
+                                color: "#FFFFFF",
+                              },
                             }}
                           >
                             Reject
@@ -427,12 +456,14 @@ const FacultyODRequestList = () => {
                                   handleProofVerification(request._id, true)
                                 }
                                 sx={{
-                                  background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-                                  color: '#FFFFFF',
-                                  '&:hover': {
-                                    background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                                    color: '#FFFFFF'
-                                  }
+                                  background:
+                                    "linear-gradient(135deg, #10B981 0%, #059669 100%)",
+                                  color: "#FFFFFF",
+                                  "&:hover": {
+                                    background:
+                                      "linear-gradient(135deg, #059669 0%, #047857 100%)",
+                                    color: "#FFFFFF",
+                                  },
                                 }}
                               >
                                 Verify Proof
@@ -445,12 +476,14 @@ const FacultyODRequestList = () => {
                                   handleProofVerification(request._id, false)
                                 }
                                 sx={{
-                                  background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-                                  color: '#FFFFFF',
-                                  '&:hover': {
-                                    background: 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)',
-                                    color: '#FFFFFF'
-                                  }
+                                  background:
+                                    "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
+                                  color: "#FFFFFF",
+                                  "&:hover": {
+                                    background:
+                                      "linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)",
+                                    color: "#FFFFFF",
+                                  },
                                 }}
                               >
                                 Reject Proof
@@ -464,13 +497,13 @@ const FacultyODRequestList = () => {
                               handleViewProof(request.proofDocument)
                             }
                             sx={{
-                              color: '#0077B6',
-                              borderColor: '#0077B6',
-                              '&:hover': {
-                                borderColor: '#0077B6',
-                                background: 'rgba(0, 119, 182, 0.1)',
-                                color: '#0077B6'
-                              }
+                              color: "#0077B6",
+                              borderColor: "#0077B6",
+                              "&:hover": {
+                                borderColor: "#0077B6",
+                                background: "rgba(0, 119, 182, 0.1)",
+                                color: "#0077B6",
+                              },
                             }}
                           >
                             View Proof
@@ -482,11 +515,13 @@ const FacultyODRequestList = () => {
                 ))}
               </TableBody>
             </Table>
-          </TableContainer>
+          </Box>
         </Paper>
 
         <Dialog open={openDialog} onClose={handleDialogClose}>
-          <DialogTitle>{action === "approve" ? "Approve Request" : "Reject Request"}</DialogTitle>
+          <DialogTitle>
+            {action === "approve" ? "Approve Request" : "Reject Request"}
+          </DialogTitle>
           <DialogContent>
             <TextField
               autoFocus
@@ -508,10 +543,10 @@ const FacultyODRequestList = () => {
             />
           </DialogContent>
           <DialogActions>
-            <Button 
-              onClick={handleDialogClose} 
+            <Button
+              onClick={handleDialogClose}
               disabled={loading}
-              sx={{ color: '#1A1F36' }}
+              sx={{ color: "#1A1F36" }}
             >
               Cancel
             </Button>
@@ -521,20 +556,22 @@ const FacultyODRequestList = () => {
               disabled={loading || !approverName}
               variant="contained"
               sx={{
-                background: action === "approve" 
-                  ? 'linear-gradient(135deg, #10B981 0%, #059669 100%)'
-                  : 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-                color: '#FFFFFF',
-                '&:hover': {
-                  background: action === "approve"
-                    ? 'linear-gradient(135deg, #059669 0%, #047857 100%)'
-                    : 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)',
-                  color: '#FFFFFF'
+                background:
+                  action === "approve"
+                    ? "linear-gradient(135deg, #10B981 0%, #059669 100%)"
+                    : "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
+                color: "#FFFFFF",
+                "&:hover": {
+                  background:
+                    action === "approve"
+                      ? "linear-gradient(135deg, #059669 0%, #047857 100%)"
+                      : "linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)",
+                  color: "#FFFFFF",
                 },
-                '&:disabled': {
-                  background: '#9CA3AF',
-                  color: '#FFFFFF'
-                }
+                "&:disabled": {
+                  background: "#9CA3AF",
+                  color: "#FFFFFF",
+                },
               }}
             >
               {action === "approve" ? "Approve" : "Reject"}
@@ -596,15 +633,16 @@ const FacultyODRequestList = () => {
             )}
           </DialogContent>
           <DialogActions>
-            <Button 
+            <Button
               onClick={() => setViewProofDialogOpen(false)}
               sx={{
-                background: 'linear-gradient(135deg, #0D3B66 0%, #0077B6 100%)',
-                color: '#FFFFFF',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #0a2d4d 0%, #006699 100%)',
-                  color: '#FFFFFF'
-                }
+                background: "linear-gradient(135deg, #0D3B66 0%, #0077B6 100%)",
+                color: "#FFFFFF",
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, #0a2d4d 0%, #006699 100%)",
+                  color: "#FFFFFF",
+                },
               }}
             >
               Close

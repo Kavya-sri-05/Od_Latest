@@ -165,8 +165,7 @@ const HODDashboard = () => {
       }
 
       const requestBody = {
-        status:
-          submitAction === "approve" ? "approved_by_hod" : "rejected",
+        status: submitAction === "approve" ? "approved_by_hod" : "rejected",
         remarks: comment,
       };
 
@@ -231,7 +230,12 @@ const HODDashboard = () => {
   }
 
   return (
-    <Box display="flex" flexDirection="column" minHeight="100vh" sx={{ background: '#F8FAFC' }}>
+    <Box
+      display="flex"
+      flexDirection="column"
+      minHeight="100vh"
+      sx={{ background: "#F8FAFC" }}
+    >
       {/* Loading Backdrop with Spinner */}
       {/* Full-screen Processing Backdrop for all actions */}
       <Backdrop
@@ -243,21 +247,32 @@ const HODDashboard = () => {
         }}
         open={actionLoading}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+          }}
+        >
           <CircularProgress color="inherit" size={60} />
-          <Typography 
+          <Typography
             variant="h5"
-            sx={{ fontFamily: "'Poppins', 'Inter', sans-serif", fontWeight: 600 }}
+            sx={{
+              fontFamily: "'Poppins', 'Inter', sans-serif",
+              fontWeight: 600,
+            }}
           >
             Processing...
           </Typography>
           {errorInfo && (
-            <Alert 
-              severity="error" 
-              sx={{ 
+            <Alert
+              severity="error"
+              sx={{
                 mt: 2,
-                borderRadius: '12px',
-                fontFamily: "'Poppins', 'Inter', sans-serif"
+                borderRadius: "12px",
+                fontFamily: "'Poppins', 'Inter', sans-serif",
               }}
             >
               {errorInfo}
@@ -268,51 +283,53 @@ const HODDashboard = () => {
 
       <SharedNavbar title="HOD Dashboard" />
       <Container maxWidth="lg" sx={{ flex: 1, py: 4, px: { xs: 2, sm: 3 } }}>
-        <Paper 
-          elevation={0} 
-          sx={{ 
-            p: { xs: 3, sm: 4 }, 
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 3, sm: 4 },
             mt: 4,
-            borderRadius: '16px',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-            border: '1px solid #E5E7EB',
-            background: '#FFFFFF'
+            borderRadius: "16px",
+            boxShadow:
+              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+            border: "1px solid #E5E7EB",
+            background: "#FFFFFF",
+            overflow: "hidden",
           }}
         >
-          <Typography 
-            variant="h4" 
+          <Typography
+            variant="h4"
             gutterBottom
-            sx={{ 
-              color: '#1A1F36',
+            sx={{
+              color: "#1A1F36",
               fontWeight: 800,
               mb: 3,
-              fontSize: { xs: '1.75rem', sm: '2rem' },
-              letterSpacing: '-0.02em',
-              fontFamily: "'Poppins', 'Inter', sans-serif"
+              fontSize: { xs: "1.75rem", sm: "2rem" },
+              letterSpacing: "-0.02em",
+              fontFamily: "'Poppins', 'Inter', sans-serif",
             }}
           >
             HOD Dashboard - Pending OD Requests
           </Typography>
 
           {error && (
-            <Alert 
-              severity="error" 
-              sx={{ 
+            <Alert
+              severity="error"
+              sx={{
                 mb: 3,
-                borderRadius: '12px',
-                fontFamily: "'Poppins', 'Inter', sans-serif"
+                borderRadius: "12px",
+                fontFamily: "'Poppins', 'Inter', sans-serif",
               }}
             >
               {error}
             </Alert>
           )}
           {success && (
-            <Alert 
-              severity="success" 
-              sx={{ 
+            <Alert
+              severity="success"
+              sx={{
                 mb: 3,
-                borderRadius: '12px',
-                fontFamily: "'Poppins', 'Inter', sans-serif"
+                borderRadius: "12px",
+                fontFamily: "'Poppins', 'Inter', sans-serif",
               }}
             >
               {success}
@@ -326,7 +343,7 @@ const HODDashboard = () => {
               alignItems="center"
               minHeight="60vh"
             >
-              <CircularProgress sx={{ color: '#0077B6' }} />
+              <CircularProgress sx={{ color: "#0077B6" }} />
             </Box>
           ) : requests.length === 0 ? (
             <Paper
@@ -334,51 +351,53 @@ const HODDashboard = () => {
               sx={{
                 p: 4,
                 textAlign: "center",
-                background: 'linear-gradient(135deg, #0D3B66 0%, #0077B6 100%)',
-                borderRadius: '16px',
-                border: '1px solid #E5E7EB',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                background: "linear-gradient(135deg, #0D3B66 0%, #0077B6 100%)",
+                borderRadius: "16px",
+                border: "1px solid #E5E7EB",
+                boxShadow:
+                  "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
               }}
             >
-              <Typography 
-                variant="h5" 
+              <Typography
+                variant="h5"
                 gutterBottom
                 sx={{
-                  color: '#FFFFFF !important',
+                  color: "#FFFFFF !important",
                   fontWeight: 700,
-                  fontSize: '1.5rem',
+                  fontSize: "1.5rem",
                   mb: 2,
                   fontFamily: "'Poppins', 'Inter', sans-serif",
-                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+                  textShadow: "0 2px 4px rgba(0, 0, 0, 0.3)",
                 }}
               >
                 No Pending Requests
               </Typography>
-              <Typography 
-                variant="body1" 
-                sx={{ 
-                  color: '#FFFFFF !important',
-                  fontSize: '1rem',
+              <Typography
+                variant="body1"
+                sx={{
+                  color: "#FFFFFF !important",
+                  fontSize: "1rem",
                   fontFamily: "'Poppins', 'Inter', sans-serif",
                   lineHeight: 1.6,
-                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)'
+                  textShadow: "0 1px 2px rgba(0, 0, 0, 0.3)",
                 }}
               >
-                All OD requests have been processed. There are no pending requests
-                waiting for your approval.
+                All OD requests have been processed. There are no pending
+                requests waiting for your approval.
               </Typography>
             </Paper>
           ) : (
-            <TableContainer 
-              component={Paper}
+            <Box
               sx={{
-                borderRadius: '12px',
-                border: '1px solid #E5E7EB',
-                overflow: 'hidden',
-                boxShadow: 'none'
+                width: "100%",
+                overflowX: "auto",
+                overflowY: "hidden",
+                WebkitOverflowScrolling: "touch",
+                border: "1px solid #E5E7EB",
+                borderRadius: "12px",
               }}
             >
-              <Table>
+              <Table sx={{ minWidth: 1400, width: "auto" }}>
                 <TableHead>
                   <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
                     <TableCell>
@@ -483,16 +502,18 @@ const HODDashboard = () => {
                             onClick={() => handleApprove(request._id)}
                             disabled={actionLoading}
                             sx={{
-                              background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
-                              color: '#FFFFFF',
-                              '&:hover': {
-                                background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                                color: '#FFFFFF'
+                              background:
+                                "linear-gradient(135deg, #10B981 0%, #059669 100%)",
+                              color: "#FFFFFF",
+                              "&:hover": {
+                                background:
+                                  "linear-gradient(135deg, #059669 0%, #047857 100%)",
+                                color: "#FFFFFF",
                               },
-                              '&:disabled': {
-                                background: '#9CA3AF',
-                                color: '#FFFFFF'
-                              }
+                              "&:disabled": {
+                                background: "#9CA3AF",
+                                color: "#FFFFFF",
+                              },
                             }}
                           >
                             Approve
@@ -504,16 +525,18 @@ const HODDashboard = () => {
                             onClick={() => handleReject(request._id)}
                             disabled={actionLoading}
                             sx={{
-                              background: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-                              color: '#FFFFFF',
-                              '&:hover': {
-                                background: 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)',
-                                color: '#FFFFFF'
+                              background:
+                                "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
+                              color: "#FFFFFF",
+                              "&:hover": {
+                                background:
+                                  "linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)",
+                                color: "#FFFFFF",
                               },
-                              '&:disabled': {
-                                background: '#9CA3AF',
-                                color: '#FFFFFF'
-                              }
+                              "&:disabled": {
+                                background: "#9CA3AF",
+                                color: "#FFFFFF",
+                              },
                             }}
                           >
                             Reject
@@ -524,63 +547,74 @@ const HODDashboard = () => {
                   ))}
                 </TableBody>
               </Table>
-            </TableContainer>
+            </Box>
           )}
         </Paper>
       </Container>
 
-      <Dialog open={openDialog} onClose={handleDialogClose} maxWidth="sm" fullWidth>
-          <DialogTitle>
-            {action === "approve" ? "Approve Request" : "Reject Request"}
-          </DialogTitle>
-          <DialogContent>
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Comment (Optional)"
-              fullWidth
-              multiline
-              rows={4}
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Add any remarks..."
-              disabled={actionLoading}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button 
-              onClick={handleDialogClose} 
-              disabled={actionLoading}
-              sx={{ color: '#1A1F36' }}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => handleSubmit(action)}
-              color={action === "approve" ? "success" : "error"}
-              variant="contained"
-              disabled={actionLoading}
-              sx={{
-                background: action === "approve" 
-                  ? 'linear-gradient(135deg, #10B981 0%, #059669 100%)'
-                  : 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
-                color: '#FFFFFF',
-                '&:hover': {
-                  background: action === "approve"
-                    ? 'linear-gradient(135deg, #059669 0%, #047857 100%)'
-                    : 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)',
-                  color: '#FFFFFF'
-                },
-                '&:disabled': {
-                  background: '#9CA3AF',
-                  color: '#FFFFFF'
-                }
-              }}
-            >
-              {actionLoading ? "Processing..." : (action === "approve" ? "Approve" : "Reject")}
-            </Button>
-          </DialogActions>
-        </Dialog>
+      <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          {action === "approve" ? "Approve Request" : "Reject Request"}
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Comment (Optional)"
+            fullWidth
+            multiline
+            rows={4}
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="Add any remarks..."
+            disabled={actionLoading}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={handleDialogClose}
+            disabled={actionLoading}
+            sx={{ color: "#1A1F36" }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => handleSubmit(action)}
+            color={action === "approve" ? "success" : "error"}
+            variant="contained"
+            disabled={actionLoading}
+            sx={{
+              background:
+                action === "approve"
+                  ? "linear-gradient(135deg, #10B981 0%, #059669 100%)"
+                  : "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
+              color: "#FFFFFF",
+              "&:hover": {
+                background:
+                  action === "approve"
+                    ? "linear-gradient(135deg, #059669 0%, #047857 100%)"
+                    : "linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)",
+                color: "#FFFFFF",
+              },
+              "&:disabled": {
+                background: "#9CA3AF",
+                color: "#FFFFFF",
+              },
+            }}
+          >
+            {actionLoading
+              ? "Processing..."
+              : action === "approve"
+              ? "Approve"
+              : "Reject"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
