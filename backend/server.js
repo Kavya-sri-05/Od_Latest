@@ -41,6 +41,7 @@ app.use(
 );
 
 // Serve static files from the assets directory
+// Serve static files from the assets directory
 app.use(
   "/assets",
   express.static(path.join(__dirname, "assets"), {

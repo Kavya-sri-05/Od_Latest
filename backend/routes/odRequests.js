@@ -162,6 +162,11 @@ router.post(
           .json({ message: "HOD not found for the department" });
       }
 
+      const isEmergency =
+        req.body.isEmergency === true ||
+        req.body.isEmergency === "true" ||
+        req.body.isEmergency === "on";
+
       const odRequest = new ODRequest({
         student: studentDoc._id, // Reference to Student, not User
         eventName,
@@ -179,6 +184,11 @@ router.post(
         notifyFaculty: notifyFaculty || [],
         brochure: req.file ? req.file.path : null,
         department: studentDoc.department || "CSE",
+        // If emergency, directly forward to admin
+        status: isEmergency ? "forwarded_to_admin" : undefined,
+        forwardedToAdminAt: isEmergency ? Date.now() : undefined,
+        lastStatusChangeAt: isEmergency ? Date.now() : undefined,
+        isEmergency: isEmergency,
       });
 
       await odRequest.save();
@@ -186,27 +196,54 @@ router.post(
       // Get user details for notification
       const user = await User.findById(req.user._id);
 
-      // Send email notification to faculty advisor
-      await sendODRequestNotification(
-        studentDoc.facultyAdvisor.email,
-        {
-          name: user.name,
-          registerNo: studentDoc.registerNo,
-          department: studentDoc.department || "CSE",
-          currentYear: studentDoc.currentYear,
-        },
-        {
-          eventName,
-          eventType,
-          eventDate,
-          startDate,
-          endDate,
-          timeType,
-          startTime,
-          endTime,
-          reason,
-        }
-      );
+      // Send email notification
+      if (isEmergency) {
+        // Notify all admin users
+        const admins = await User.find({ role: "admin" });
+        const adminEmails = admins.map((a) => a.email).join(",");
+        await sendODRequestNotification(
+          adminEmails,
+          {
+            name: user.name,
+            registerNo: studentDoc.registerNo,
+            department: studentDoc.department || "CSE",
+            currentYear: studentDoc.currentYear,
+          },
+          {
+            eventName,
+            eventType,
+            eventDate,
+            startDate,
+            endDate,
+            timeType,
+            startTime,
+            endTime,
+            reason,
+          }
+        );
+      } else {
+        // Send email notification to faculty advisor
+        await sendODRequestNotification(
+          studentDoc.facultyAdvisor.email,
+          {
+            name: user.name,
+            registerNo: studentDoc.registerNo,
+            department: studentDoc.department || "CSE",
+            currentYear: studentDoc.currentYear,
+          },
+          {
+            eventName,
+            eventType,
+            eventDate,
+            startDate,
+            endDate,
+            timeType,
+            startTime,
+            endTime,
+            reason,
+          }
+        );
+      }
 
       res.status(201).json(odRequest);
     } catch (error) {

@@ -161,6 +161,10 @@ const odRequestSchema = new mongoose.Schema(
       type: String, // Path to the uploaded event brochure
       default: null,
     },
+    isEmergency: {
+      type: Boolean,
+      default: false,
+    },
     advisorApprovedAt: {
       type: Date,
       default: null,
