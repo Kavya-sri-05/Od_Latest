@@ -130,6 +130,7 @@ const AdminManagement = () => {
   const [senderEmailPasswordError, setSenderEmailPasswordError] = useState("");
   const [senderEmailLoading, setSenderEmailLoading] = useState(false);
   const senderEmailInputRef = useRef();
+  const [filterApprovalStatus, setFilterApprovalStatus] = useState(""); 
 
   // Popup state
   const [openSenderDialog, setOpenSenderDialog] = useState(false);
@@ -198,7 +199,7 @@ const AdminManagement = () => {
     "NSS",
     "workshop",
   ];
-
+  
   const fetchStudentStats = async () => {
     try {
       const response = await axios.get(
@@ -410,6 +411,10 @@ const AdminManagement = () => {
       return false;
     }
 
+    // Approval Status filter
+    if (filterApprovalStatus && request.status !== filterApprovalStatus) {
+      return false;
+    }
     // Academic Year (date range)
     if (academicYearRange[0] && academicYearRange[1]) {
       const start = startOfDay(academicYearRange[0]);
@@ -1379,7 +1384,7 @@ const AdminManagement = () => {
                     <Grid container spacing={1}>
                       <Grid item xs={6}>
                         <DatePicker
-                          label="Academic Year Start"
+                          label="Year Start"
                           value={academicYearRange[0]}
                           onChange={(newValue) =>
                             setAcademicYearRange([
@@ -1394,7 +1399,7 @@ const AdminManagement = () => {
                       </Grid>
                       <Grid item xs={6}>
                         <DatePicker
-                          label="Academic Year End"
+                          label="Year End"
                           value={academicYearRange[1]}
                           onChange={(newValue) =>
                             setAcademicYearRange([
@@ -1407,6 +1412,24 @@ const AdminManagement = () => {
                           }}
                         />
                       </Grid>
+                      <Grid item xs={12} md={2}>
+                        <TextField
+                          select
+                          fullWidth
+                          variant="outlined"
+                          label="Approval Status"
+                          value={filterApprovalStatus}
+                          onChange={(e) => setFilterApprovalStatus(e.target.value)}
+                          >
+                         <MenuItem value="">All Statuses</MenuItem>
+                         <MenuItem value="approved_by_advisor">Approved by Advisor</MenuItem>
+                         <MenuItem value="approved_by_hod">Approved by HOD</MenuItem>
+                         <MenuItem value="rejected">Rejected</MenuItem>
+                         <MenuItem value="forwarded_to_admin">Forwarded to Admin</MenuItem>
+                         <MenuItem value="forwarded_to_hod">Forwarded to HOD</MenuItem>
+              
+                        </TextField>
+                     </Grid>
                     </Grid>
                   </LocalizationProvider>
                 </Grid>

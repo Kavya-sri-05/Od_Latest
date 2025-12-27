@@ -429,6 +429,8 @@ router.put(
             reason: odRequest.reason,
           },
           odRequest.proofDocument,
+          odRequest.approvedPDFPath,
+          approverEmails,
           approvedPDFPath,
           "verified"
         );
@@ -604,7 +606,8 @@ router.post(
             reason: odRequest.reason,
           },
           odRequest.proofDocument,
-          odRequest.approvedPDFPath
+          odRequest.approvedPDFPath,
+          approverEmails
         );
       }
     } catch (emailErr) {
@@ -1404,6 +1407,7 @@ router.put(
       const trimmedName = req.body.classAdvisorName.trim();
       odRequest.approverName = trimmedName;
 
+      odRequest.advisorApprovedAt = new Date();
       // Also update the classAdvisor name if it's an object, otherwise create a simple name storage
       console.log("Admin entered class advisor name:", trimmedName);
       console.log("Before save - approverName:", odRequest.approverName);
@@ -1730,7 +1734,7 @@ const generateApprovedPDF = async (odRequest, outputPath) => {
     console.log("PDF Generation - advisorDisplayName:", advisorDisplayName);
     drawLabeledRow(
       "Authority Sanctioning the OD:",
-      `${advisorDisplayName} (Class Advisor) and ${odRequest.hod.name} (HOD)`
+      `${advisorDisplayName} (for Class Advisor) and ${odRequest.hod.name} (HOD)`
     );
     drawLabeledRow("Date of Sanction:", new Date().toLocaleDateString());
 

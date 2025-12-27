@@ -163,9 +163,17 @@ const ODRequestForm = () => {
     try {
       setIsSubmitting(true);
       const form = new FormData();
+      let eventNameToSend = formData.eventName;
+      if (formData.isEmergency && !eventNameToSend.toLowerCase().includes("(emergency)")) {
+        eventNameToSend += " (Emergency Request)";
+      }
       Object.entries(formData).forEach(([key, value]) => {
         if (value !== null && value !== undefined) {
-          form.append(key, value);
+          if (key === "eventName") {
+            form.append(key, eventNameToSend);
+          } else {
+            form.append(key, value);
+          }
         }
       });
       if (brochureFile) {
