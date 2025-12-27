@@ -53,6 +53,11 @@ const LandingPage = () => {
               </Link>
             </li>
             <li className="isb-nav-item">
+              <Link to="/contributors" className="isb-nav-link">
+                Contributors
+              </Link>
+            </li>
+            <li className="isb-nav-item">
               <Link to="/login" className="isb-nav-link">
                 Login
               </Link>

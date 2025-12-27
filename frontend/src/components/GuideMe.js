@@ -8,7 +8,8 @@ const downloadGuidePDF = (user) => {
   let fileName = "";
   switch (user.role) {
     case "student":
-      fileName = "student_user_guide.pdf";
+      // Use the actual filename placed in backend/assets (note the space and parentheses)
+      fileName = "student_user_guide (1).pdf";
       break;
     case "faculty":
       fileName = "faculty_user_guide.pdf";

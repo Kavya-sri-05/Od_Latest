@@ -196,52 +196,59 @@ router.post(
       // Get user details for notification
       const user = await User.findById(req.user._id);
 
-      // Send email notification
-      if (isEmergency) {
-        // Notify all admin users
-        const admins = await User.find({ role: "admin" });
-        const adminEmails = admins.map((a) => a.email).join(",");
-        await sendODRequestNotification(
-          adminEmails,
-          {
-            name: user.name,
-            registerNo: studentDoc.registerNo,
-            department: studentDoc.department || "CSE",
-            currentYear: studentDoc.currentYear,
-          },
-          {
-            eventName,
-            eventType,
-            eventDate,
-            startDate,
-            endDate,
-            timeType,
-            startTime,
-            endTime,
-            reason,
-          }
-        );
-      } else {
-        // Send email notification to faculty advisor
-        await sendODRequestNotification(
-          studentDoc.facultyAdvisor.email,
-          {
-            name: user.name,
-            registerNo: studentDoc.registerNo,
-            department: studentDoc.department || "CSE",
-            currentYear: studentDoc.currentYear,
-          },
-          {
-            eventName,
-            eventType,
-            eventDate,
-            startDate,
-            endDate,
-            timeType,
-            startTime,
-            endTime,
-            reason,
-          }
+      // Send email notification (don't fail request if email sending errors occur)
+      try {
+        if (isEmergency) {
+          // Notify all admin users
+          const admins = await User.find({ role: "admin" });
+          const adminEmails = admins.map((a) => a.email).join(",");
+          await sendODRequestNotification(
+            adminEmails,
+            {
+              name: user.name,
+              registerNo: studentDoc.registerNo,
+              department: studentDoc.department || "CSE",
+              currentYear: studentDoc.currentYear,
+            },
+            {
+              eventName,
+              eventType,
+              eventDate,
+              startDate,
+              endDate,
+              timeType,
+              startTime,
+              endTime,
+              reason,
+            }
+          );
+        } else {
+          // Send email notification to faculty advisor
+          await sendODRequestNotification(
+            studentDoc.facultyAdvisor.email,
+            {
+              name: user.name,
+              registerNo: studentDoc.registerNo,
+              department: studentDoc.department || "CSE",
+              currentYear: studentDoc.currentYear,
+            },
+            {
+              eventName,
+              eventType,
+              eventDate,
+              startDate,
+              endDate,
+              timeType,
+              startTime,
+              endTime,
+              reason,
+            }
+          );
+        }
+      } catch (emailErr) {
+        console.error(
+          "Non-fatal: error sending OD request notification:",
+          emailErr
         );
       }
 
