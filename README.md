@@ -116,8 +116,8 @@ Od_Latest/
 
 Backend `.env` example:
 ```
-PORT=5001
-MONGO_URI=mongodb://127.0.0.1:27017/odapplication
+PORT=port_no
+MONGO_URI=your_mongo_uri
 JWT_SECRET=your_super_secret_jwt_key
 EMAIL_USER=your_email@gmail.com
 EMAIL_PASSWORD=your_email_app_password_generated
