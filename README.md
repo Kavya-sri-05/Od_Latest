@@ -123,6 +123,3 @@ EMAIL_USER=your_email@gmail.com
 EMAIL_PASSWORD=your_email_app_password_generated
 ```
 
-## License
-
-This project is licensed under the ISC License.
